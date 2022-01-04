@@ -1,0 +1,24 @@
+{
+  "$id": "todo-item.json",
+  "$schema": "http://json-schema.org/schema",
+  "type": "object",
+  "required": ["name", "completed", "supplyRequired"],
+  "additionalProperties": false,
+  "properties": {
+    "name": { "type": "string" },
+    "description": { "type": "string" },
+    "completed": { "type": "boolean" },
+    "supplyRequired": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["supplyRef", "quantity"],
+        "additionalProperties": false,
+        "properties": {
+          "supplyRef": {},
+          "quantity": { "type": "integer", "minimum": 0 }
+        }
+      }
+    }
+  }
+}

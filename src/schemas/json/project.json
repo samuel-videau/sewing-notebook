@@ -1,0 +1,17 @@
+{
+  "$id": "project.json",
+  "$schema": "http://json-schema.org/schema",
+  "type": "object",
+  "required": ["name", "todo"],
+  "additionalProperties": false,
+  "properties": {
+    "name": { "type": "string" },
+    "description": { "type": "string" },
+    "todo": {
+      "type": "array",
+      "items": {
+        "$ref": "todo-item.json"
+      }
+    }
+  }
+}
