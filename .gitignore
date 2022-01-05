@@ -2,3 +2,5 @@ dist
 node_modules
 
 /package-lock.json
+/src/environment/sewing-notebook-service-account.json
+/src/environment/sewing-notebook-service-account-test.json
