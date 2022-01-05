@@ -1,6 +1,5 @@
 {
   "projects": {
-    "default": "sewing-notebook",
-    "test": "sewing-notebook-test",
+    "default": "sewing-notebook"
   }
 }

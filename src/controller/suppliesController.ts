@@ -3,9 +3,9 @@ import {Supply} from "../schemas/types/supply";
 import * as admin from 'firebase-admin';
 import * as supplySchema from '../schemas/json/supply.json';
 
-const supplyCollection = admin.firestore().collection('supply');
-
 export async function suppliesController (fastify: FastifyInstance) {
+  const supplyCollection = admin.firestore().collection('supply');
+
   fastify.route<{ Body: Supply }>({
     method: 'POST',
     url: '/',
