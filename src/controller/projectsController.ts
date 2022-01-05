@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify'
 import { Project } from "../schemas/types/project";
-
+import * as admin from 'firebase-admin';
 import * as projectSchema from "../schemas/json/project.json";
 
 const projectIdSchema = {
@@ -11,6 +11,8 @@ const projectIdSchema = {
 }
 
 export async function projectsController (fastify: FastifyInstance) {
+    const projectCollection = admin.firestore().collection('project');
+
     fastify.route<{ Body: Project }>({
       method: 'POST',
       url: '/',
@@ -18,7 +20,10 @@ export async function projectsController (fastify: FastifyInstance) {
         body: projectSchema,
         response: { 200: projectSchema },
       },
-      handler: async function (request, reply) {
+      handler: async (request, reply) => {
+        const supply: Project = request.body;
+        await projectCollection.add(supply);
+        return reply.code(200).send(supply);
       }
     });
 

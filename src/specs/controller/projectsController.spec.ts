@@ -1,13 +1,9 @@
-import chai from 'chai';
-import chaiHttp from 'chai-http';
+import { expect } from 'chai';
 import { fastify } from '../../lib/fastify';
-
-
-chai.use(chaiHttp);
 
 describe('projectsController tests', () => {
 
-  it('POST should accept correctly formed bodies', () => {
+  it('POST should accept correctly formed bodies', async () => {
     const projectBody = {
         name : 'Project name',
         description: 'Project description',
@@ -22,8 +18,8 @@ describe('projectsController tests', () => {
         }]
     };
 
-    chai.assert(true);
-
+    const res = await fastify.inject({ method: 'POST', url: '/projects', payload: projectBody});
+    expect(res.statusCode).to.equal(200);
   });
 
 });
