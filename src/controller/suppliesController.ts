@@ -3,15 +3,17 @@ import {Supply} from "../schemas/types/supply";
 
 import * as supplySchema from '../schemas/json/supply.json';
 
-export function suppliesController (fastify: FastifyInstance) {
+export async function suppliesController (fastify: FastifyInstance) {
   fastify.route<{ Body: Supply }>({
     method: 'POST',
     url: '/',
     schema: {
       body: supplySchema,
-      // response: { 200: supplySchema }
+      response: { 200: supplySchema }
     },
-    handler: async function (request, reply) {
+    handler: async (request, reply) => {
+      console.log(request.body);
+      return reply.send(request.body);
     }
   });
 }

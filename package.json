@@ -2,11 +2,11 @@
   "name": "node-ts-template",
   "version": "1.0.0",
   "description": "Basic template of a node + typescript project",
-  "main": "dist/index.js",
+  "main": "dist/src/index.js",
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "run": "node dist/index.js",
+    "run": "node dist/src/index.js",
     "lint": "eslint src/**/*",
     "lint autofix": "eslint --fix src/**/*",
     "test": "mocha ./dist/test/test.js"
