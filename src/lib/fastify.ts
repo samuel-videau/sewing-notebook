@@ -1,5 +1,7 @@
 import fastifyFactory from 'fastify'
 import {suppliesController} from "../controller/suppliesController";
+import { projectsController } from '../controller/projectsController';
+import { todoItemsController } from '../controller/todoController';
 
 import * as projectSchema from '../schemas/json/project.json';
 import * as todoItemSchema from '../schemas/json/todo-item.json';
@@ -10,3 +12,5 @@ export const fastify = fastifyFactory({ logger: true })
   .addSchema(projectSchema)
   .addSchema(supplySchema)
   .register(suppliesController, { prefix: '/supplies' })
+  .register(projectsController, { prefix: '/projects' })
+  .register(todoItemsController, {prefix: '/projects/:projectId/todo'});

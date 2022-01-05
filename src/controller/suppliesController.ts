@@ -70,4 +70,12 @@ export async function suppliesController (fastify: FastifyInstance) {
       }
     }
   });
+
+  fastify.route<{ Body: Supply }>({
+    method: 'GET',
+    url: '/',
+    handler: async (request, reply) => {
+      return reply.code(200).send('ok');
+    }
+  });
 }

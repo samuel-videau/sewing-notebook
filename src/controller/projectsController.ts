@@ -3,6 +3,13 @@ import { Project } from "../schemas/types/project";
 
 import * as projectSchema from "../schemas/json/project.json";
 
+const projectIdSchema = {
+    type: 'object',
+    properties: {
+        projectId: { type: 'number' }
+    }
+}
+
 export async function projectsController (fastify: FastifyInstance) {
     fastify.route<{ Body: Project }>({
       method: 'POST',
@@ -26,8 +33,8 @@ export async function projectsController (fastify: FastifyInstance) {
         method: 'GET',
         url: '/:projectId',
         schema: {
-            response: { 200: projectSchema },
-          },
+            params : projectIdSchema
+        },
         handler: async function (request, reply) {
         }
     });
@@ -37,6 +44,7 @@ export async function projectsController (fastify: FastifyInstance) {
         url: '/:projectId',
         schema: {
             body: projectSchema,
+            params : projectIdSchema
           },
         handler: async function (request, reply) {
         }
@@ -45,6 +53,9 @@ export async function projectsController (fastify: FastifyInstance) {
     fastify.route<{ Body: Project }>({
         method: 'DELETE',
         url: '/:projectId',
+        schema: {
+            params : projectIdSchema
+          },
         handler: async function (request, reply) {
         }
     });

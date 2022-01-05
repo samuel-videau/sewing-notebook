@@ -3,7 +3,14 @@ import { TodoItem } from "../schemas/types/todo-item";
 
 import * as todoItemSchema from "../schemas/json/todo-item.json";
 
-export async function TodoItemsController (fastify: FastifyInstance) {
+const todoItemIdSchema = {
+    type: 'object',
+    properties: {
+        todoItemId: { type: 'number' }
+    }
+}
+
+export async function todoItemsController (fastify: FastifyInstance) {
     fastify.route<{ Body: TodoItem }>({
       method: 'POST',
       url: '/',
@@ -24,9 +31,10 @@ export async function TodoItemsController (fastify: FastifyInstance) {
 
     fastify.route<{ Body: TodoItem }>({
         method: 'GET',
-        url: '/:TodoItemId',
+        url: '/:todoItemId',
         schema: {
             response: { 200: todoItemSchema },
+            params: todoItemIdSchema
           },
         handler: async function (request, reply) {
         }
@@ -34,9 +42,10 @@ export async function TodoItemsController (fastify: FastifyInstance) {
 
     fastify.route<{ Body: TodoItem }>({
         method: 'PUT',
-        url: '/:TodoItemId',
+        url: '/:todoItemId',
         schema: {
             body: todoItemSchema,
+            params: todoItemIdSchema
           },
         handler: async function (request, reply) {
         }
@@ -44,7 +53,10 @@ export async function TodoItemsController (fastify: FastifyInstance) {
 
     fastify.route<{ Body: TodoItem }>({
         method: 'DELETE',
-        url: '/:TodoItemId',
+        url: '/:todoItemId',
+        schema: {
+            params: todoItemIdSchema
+        },
         handler: async function (request, reply) {
         }
     });
