@@ -3,7 +3,7 @@ import { Project } from "../schemas/types/project";
 
 import * as projectSchema from "../schemas/json/project.json";
 
-export async function invoicesRoutes (fastify: FastifyInstance) {
+export async function projectsController (fastify: FastifyInstance) {
     fastify.route<{ Body: Project }>({
       method: 'POST',
       url: '/',
