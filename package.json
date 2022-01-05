@@ -2,14 +2,14 @@
   "name": "node-ts-template",
   "version": "1.0.0",
   "description": "Basic template of a node + typescript project",
-  "main": "dist/src/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "run": "node dist/src/index.js",
+    "run": "node dist/index.js",
     "lint": "eslint src/**/*",
     "lint autofix": "eslint --fix src/**/*",
-    "test": "mocha ./dist/test/test.js"
+    "test": "mocha ./dist/specs/**/*"
   },
   "author": "Thomas VEILLARD",
   "license": "ISC",
@@ -25,6 +25,8 @@
     "typescript": "^4.3.2"
   },
   "dependencies": {
-    "fastify": "^3.24.1"
+    "dotenv": "^10.0.0",
+    "fastify": "^3.24.1",
+    "firebase-admin": "^10.0.1"
   }
 }
