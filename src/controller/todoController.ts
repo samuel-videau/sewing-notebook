@@ -1,16 +1,19 @@
 import { FastifyInstance } from 'fastify'
 import { TodoItem } from "../schemas/types/todo-item";
-
+import * as admin from 'firebase-admin';
 import * as todoItemSchema from "../schemas/json/todo-item.json";
 
 const todoItemIdSchema = {
     type: 'object',
+    required: ['projectId'],
     properties: {
-        todoItemId: { type: 'number' }
+        projectId: { type: 'string' }
     }
 }
 
 export async function todoItemsController (fastify: FastifyInstance) {
+    const projectCollection = admin.firestore().collection('project');
+
     fastify.route<{ Body: TodoItem }>({
       method: 'POST',
       url: '/',
@@ -25,7 +28,16 @@ export async function todoItemsController (fastify: FastifyInstance) {
     fastify.route<{ Body: TodoItem }>({
         method: 'GET',
         url: '/',
+        schema: {
+            response: { 200: {
+                "type": "array",
+                "items": todoItemSchema
+              }
+            }
+          },
         handler: async function (request, reply) {
+            const projects = await projectCollection.get();
+            return projects.docs.map(project => project.data() as TodoItem);
         }
       });
 
