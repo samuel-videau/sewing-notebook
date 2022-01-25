@@ -7,6 +7,8 @@ import fastifySwagger from 'fastify-swagger';
 import * as projectSchema from '../schemas/json/project.json';
 import * as todoItemSchema from '../schemas/json/todo-item.json';
 import * as supplySchema from '../schemas/json/supply.json';
+import * as updateSupplySchema from '../schemas/json/update-supply.json';
+import * as updateProjectSchema from '../schemas/json/update-project.json';
 
 export const fastify = fastifyFactory({ logger: true })
   .register(fastifySwagger, {
@@ -39,7 +41,7 @@ export const fastify = fastifyFactory({ logger: true })
       }
     },
     uiConfig: {
-      docExpansion: 'full',
+      docExpansion: 'list',
       deepLinking: false
     },
     uiHooks: {
@@ -53,6 +55,8 @@ export const fastify = fastifyFactory({ logger: true })
   .addSchema(projectSchema)
   .addSchema(todoItemSchema)
   .addSchema(supplySchema)
+  .addSchema(updateSupplySchema)
+  .addSchema(updateProjectSchema)
   .register(suppliesController, { prefix: '/supplies' })
   .register(projectsController, { prefix: '/projects' })
   .register(todoItemsController, {prefix: '/projects/:projectId/todo'});
