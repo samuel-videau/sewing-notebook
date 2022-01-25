@@ -15,15 +15,19 @@ const suppliesParamsSchema = {
 
 export async function suppliesController (fastify: FastifyInstance) {
   const supplyCollection = admin.firestore().collection('supply');
-
+ 
   fastify.route<{ Body: Supply }>({
-    method: 'GET',
+    method: 'GET', 
     url: '/',
     schema: {
+      description: 'Get the list of all supplies',
+      tags: ['supply'],
+      summary: 'Get all supplies',
       response: { 200: {
-          "type": "array",
-          "items": supplySchema
-        }
+            description: 'Successful response',
+            "type": "array",
+            "items": supplySchema
+          }
       }
     },
     handler: async (request, reply) => {
