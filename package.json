@@ -27,6 +27,7 @@
   "dependencies": {
     "dotenv": "^10.0.0",
     "fastify": "^3.24.1",
+    "fastify-swagger": "^4.13.1",
     "firebase-admin": "^10.0.1"
   }
 }
