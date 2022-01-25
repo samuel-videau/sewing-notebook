@@ -5,10 +5,10 @@
   "required": ["name", "type", "color", "quantityLeft"],
   "additionalProperties": false,
   "properties": {
-    "name": { "type": "string" },
-    "description": { "type": "string" },
-    "type": { "type": "string" },
-    "color": { "type": "string" },
-    "quantityLeft": { "type": "integer", "minimum": 0 }
+    "name": { "type": "string", "description": "Name of the item (required)" },
+    "description": { "type": "string", "description": "Description of the item" },
+    "type": { "type": "string", "description": "Type of the item (required)" },
+    "color": { "type": "string", "description": "Color of the item (required)" },
+    "quantityLeft": { "type": "integer", "minimum": 0, "description": "Remaining quantity of the item (required)" }
   }
 }

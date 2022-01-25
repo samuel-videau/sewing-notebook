@@ -5,10 +5,11 @@
   "required": ["name", "completed", "supplyRequired"],
   "additionalProperties": false,
   "properties": {
-    "name": { "type": "string" },
-    "description": { "type": "string" },
-    "completed": { "type": "boolean" },
+    "name": { "type": "string", "description": "Name of the to-do item (required)" },
+    "description": { "type": "string", "description": "Description of the to-do item" },
+    "completed": { "type": "boolean", "description": "Whether the to-do item has been completed (required)" },
     "supplyRequired": {
+      "description": "List of supplies required to complete the to-do item (required)",
       "type": "array",
       "items": {
         "type": "object",
