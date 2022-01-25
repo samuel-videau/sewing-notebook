@@ -40,7 +40,7 @@ export async function todoItemsController (fastify: FastifyInstance) {
         description: 'Create a to-do item',
         tags: ['to-do'],
         summary: 'Create a to-do item',
-        body: {todoItemSchema},
+        body: todoItemSchema,
         params : projectParamsSchema,
         response: { 200: idResponseSchema}
       },

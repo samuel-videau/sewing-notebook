@@ -23,7 +23,7 @@ export async function projectsController (fastify: FastifyInstance) {
         description: 'Create a project',
         tags: ['project'],
         summary: 'Create a project',
-        body: {projectSchema},
+        body: projectSchema,
         response: { 200: idResponseSchema },
       },
       handler: async (request, reply) => {
@@ -99,7 +99,7 @@ export async function projectsController (fastify: FastifyInstance) {
           description: 'Modify a specific project',
           tags: ['project'],
           summary: 'Modify information about a specific project',
-            body: {updateProjectSchema},
+            body: updateProjectSchema,
             params : projectParamsSchema,
             response: {}
           },

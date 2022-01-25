@@ -15,7 +15,7 @@ const suppliesParamsSchema = {
 
 export async function suppliesController (fastify: FastifyInstance) {
   const supplyCollection = admin.firestore().collection('supply');
- 
+
 
   fastify.route<{ Body: Supply }>({
     method: 'POST',
@@ -24,7 +24,7 @@ export async function suppliesController (fastify: FastifyInstance) {
       description: 'Create a supply',
       tags: ['supply'],
       summary: 'Create a supply',
-      body: {supplySchema},
+      body: supplySchema,
       response: { 200: idResponseSchema}
     },
     handler: async (request, reply) => {
@@ -34,7 +34,7 @@ export async function suppliesController (fastify: FastifyInstance) {
   });
 
   fastify.route<{ Body: Supply }>({
-    method: 'GET', 
+    method: 'GET',
     url: '/',
     schema: {
       description: 'Get the list of all supplies',
@@ -84,7 +84,7 @@ export async function suppliesController (fastify: FastifyInstance) {
       description: 'Modify a specific supply',
       tags: ['supply'],
       summary: 'Modify information about a specific supply',
-      body: {updateSupplySchema},
+      body: updateSupplySchema,
       params: suppliesParamsSchema
       },
     handler: async (request, reply) => {
