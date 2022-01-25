@@ -3,6 +3,14 @@ import {Supply} from "../schemas/types/supply";
 import * as admin from 'firebase-admin';
 import * as supplySchema from '../schemas/json/supply.json';
 
+const suppliesParamsSchema = {
+  type: 'object',
+  required: ['supplyId'],
+  properties: {
+      supplyId: { type: 'string' }
+  }
+}
+
 export async function suppliesController (fastify: FastifyInstance) {
   const supplyCollection = admin.firestore().collection('supply');
 
@@ -58,6 +66,7 @@ export async function suppliesController (fastify: FastifyInstance) {
     method: 'GET',
     url: '/:supplyId',
     schema: {
+      params : suppliesParamsSchema,
       response: { 200: supplySchema }
       },
     handler: async (request, reply) => {
@@ -71,11 +80,40 @@ export async function suppliesController (fastify: FastifyInstance) {
     }
   });
 
-  // fastify.route<{ Body: Supply }>({
-  //   method: 'GET',
-  //   url: '/',
-  //   handler: async (request, reply) => {
-  //     return reply.code(200).send('ok');
-  //   }
-  // });
+  fastify.route<{ Body: Supply }>({
+    method: 'PUT',
+    url: '/:supplyId',
+    schema: {
+      body: { 200: supplySchema },
+      params: suppliesParamsSchema
+      },
+    handler: async (request, reply) => {
+      try {
+        const { supplyId } = request.params as any;
+        await supplyCollection.doc(supplyId).set(request.body as Supply);
+        reply.code(200).send();
+      } catch (e: any) {
+        return reply.code(404).send('Supply not found');
+      }
+    }
+  });
+
+  fastify.route<{ Body: Supply }>({
+    method: 'DELETE',
+    url: '/:supplyId',
+    schema: {
+        params : suppliesParamsSchema
+      },
+    handler: async function (request, reply) {
+      try {
+        const { supplyId } = request.params as any;
+      await supplyCollection.doc(supplyId).delete();
+
+      reply.code(200).send();
+      } catch (e: any) {
+        return reply.code(404).send('Supply not found');
+      }
+    }
+});
+
 }

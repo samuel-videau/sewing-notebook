@@ -5,23 +5,34 @@ import * as todoItemSchema from "../schemas/json/todo-item.json";
 
 const todoItemIdSchema = {
     type: 'object',
-    required: ['projectId'],
+    required: ['todoItemId'],
     properties: {
-        projectId: { type: 'string' }
+      todoItemId: { type: 'string' }
     }
 }
 
 export async function todoItemsController (fastify: FastifyInstance) {
-    const projectCollection = admin.firestore().collection('project');
+    const todoItemCollection = admin.firestore().collection('project');
 
     fastify.route<{ Body: TodoItem }>({
       method: 'POST',
       url: '/',
       schema: {
         body: todoItemSchema,
-        response: { 200: todoItemSchema },
+        response: { 200: {
+            "type": "object",
+            "required": ["id"],
+            "additionalProperties": false,
+            "properties": {
+              "name": {"id": "string"}
+            }
+          }
+        }
       },
       handler: async function (request, reply) {
+        const supply: TodoItem = request.body;
+        const res = await todoItemCollection.add(supply);
+        return reply.code(200).send(res.id);
       }
     });
 
@@ -36,8 +47,8 @@ export async function todoItemsController (fastify: FastifyInstance) {
             }
           },
         handler: async function (request, reply) {
-            const projects = await projectCollection.get();
-            return projects.docs.map(project => project.data() as TodoItem);
+            const todoItems = await todoItemCollection.get();
+            return todoItems.docs.map(todo => todo.data() as TodoItem);
         }
       });
 
@@ -49,6 +60,13 @@ export async function todoItemsController (fastify: FastifyInstance) {
             params: todoItemIdSchema
           },
         handler: async function (request, reply) {
+          try {
+            const todoItemId: string = (request.params as {supplyId: string}).supplyId
+            const doc = await todoItemCollection.doc(todoItemId).get();
+            return reply.code(200).send(JSON.stringify(doc.data() as TodoItem));
+          } catch (e: any) {
+            return reply.code(404).send('To-do item not found');
+          }
         }
     });
 
@@ -60,6 +78,13 @@ export async function todoItemsController (fastify: FastifyInstance) {
             params: todoItemIdSchema
           },
         handler: async function (request, reply) {
+          try {
+            const { todoItemId } = request.params as any;
+            await todoItemCollection.doc(todoItemId).set(request.body as TodoItem);
+            reply.code(200).send();
+          } catch (e: any) {
+            return reply.code(404).send('To-do item not found');
+          }
         }
     });
 
@@ -70,6 +95,14 @@ export async function todoItemsController (fastify: FastifyInstance) {
             params: todoItemIdSchema
         },
         handler: async function (request, reply) {
+          try {
+            const { todoItemId } = request.params as any;
+          await todoItemCollection.doc(todoItemId).delete();
+    
+          reply.code(200).send();
+          } catch (e: any) {
+            return reply.code(404).send('To-do item not found');
+          }
         }
     });
   }
