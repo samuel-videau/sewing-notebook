@@ -6,9 +6,10 @@
   "additionalProperties": false,
   "properties": {
     "id": {"type":  "string"},
-    "name": { "type": "string" },
-    "description": { "type": "string" },
+    "name": { "type": "string", "description": "Name of the project (required)" },
+    "description": { "type": "string", "description": "Description of the project" },
     "todo": {
+      "description": "List of to-do items (required)",
       "type": "array",
       "items": {
         "$ref": "todo-item.json"

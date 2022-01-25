@@ -9,25 +9,19 @@ import * as todoItemSchema from '../schemas/json/todo-item.json';
 import * as supplySchema from '../schemas/json/supply.json';
 
 export const fastify = fastifyFactory({ logger: true })
-  .addSchema(todoItemSchema)
-  .addSchema(projectSchema)
-  .addSchema(supplySchema)
-  .register(suppliesController, { prefix: '/supplies' })
-  .register(projectsController, { prefix: '/projects' })
-  .register(todoItemsController, {prefix: '/projects/:projectId/todo'})
   .register(fastifySwagger, {
     routePrefix: '/documentation',
     swagger: {
       info: {
         title: 'Sewing Notebook',
-        description: 'We are creating a sewing stash manager to follow the quantity of sewing supplies while doing projects. Some supplies will be for personnal use only, while other supplies may be shared between several users.',
+        description: 'A sewing stash manager to follow the quantity of sewing supplies while doing projects. Some supplies will be for personnal use only, while other supplies may be shared between several users.',
         version: '0.1.0'
       },
       externalDocs: {
         url: 'https://github.com/samuel-videau/sewing-notebook',
         description: 'Link to the Github repository'
       },
-      host: 'localhost',
+      host: 'localhost:3000',
       schemes: ['http'],
       consumes: ['application/json'],
       produces: ['application/json'],
@@ -55,5 +49,11 @@ export const fastify = fastifyFactory({ logger: true })
     staticCSP: true,
     transformStaticCSP: (header) => header,
     exposeRoute: true
-  });
+  })
+  .addSchema(projectSchema)
+  .addSchema(todoItemSchema)
+  .addSchema(supplySchema)
+  .register(suppliesController, { prefix: '/supplies' })
+  .register(projectsController, { prefix: '/projects' })
+  .register(todoItemsController, {prefix: '/projects/:projectId/todo'});
   
