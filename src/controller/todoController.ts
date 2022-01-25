@@ -16,7 +16,7 @@ const todoItemIdSchema = {
     type: 'object',
     required: ['todoItemId'],
     properties: {
-      todoItemId: { type: 'string' }
+      todoItemId: { type: 'string', description: 'Id of the to-do item' }
     }
 }
 
@@ -27,7 +27,10 @@ export async function todoItemsController (fastify: FastifyInstance) {
       method: 'POST',
       url: '/',
       schema: {
-        body: todoItemSchema,
+        description: 'Create a to-do item',
+        tags: ['to-do'],
+        summary: 'Create a to-do item',
+        body: {todoItemSchema},
         params : projectParamsSchema,
         response: { 200: idResponseSchema}
       },
@@ -44,6 +47,9 @@ export async function todoItemsController (fastify: FastifyInstance) {
         method: 'GET',
         url: '/',
         schema: {
+            description: 'Get the list of all to-do items',
+            tags: ['to-do'],
+            summary: 'Get all to-do items',
           params : projectParamsSchema,
           response: { 200: {
                 "type": "array",

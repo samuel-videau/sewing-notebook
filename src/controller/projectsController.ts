@@ -9,7 +9,7 @@ const projectParamsSchema = {
     type: 'object',
     required: ['projectId'],
     properties: {
-        projectId: { type: 'string' }
+        projectId: { type: 'string', description: 'Id of the project' }
     }
 }
 
@@ -20,7 +20,10 @@ export async function projectsController (fastify: FastifyInstance) {
       method: 'POST',
       url: '/',
       schema: {
-        body: projectSchema,
+        description: 'Create a project',
+        tags: ['project'],
+        summary: 'Create a project',
+        body: {projectSchema},
         response: { 200: idResponseSchema },
       },
       handler: async (request, reply) => {
@@ -46,6 +49,9 @@ export async function projectsController (fastify: FastifyInstance) {
         method: 'GET',
         url: '/',
         schema: {
+          description: 'Get the list of all projects',
+          tags: ['project'],
+          summary: 'Get all projects',
             response: { 200: {
                 "type": "array",
                 "items": projectSchema
@@ -69,6 +75,9 @@ export async function projectsController (fastify: FastifyInstance) {
     method: 'GET',
     url: '/:projectId',
     schema: {
+      description: 'Get information about a specific project',
+      tags: ['project'],
+      summary: 'Get a specific project',
         response: { 200:  projectSchema },
         params : projectParamsSchema
     },
@@ -87,7 +96,10 @@ export async function projectsController (fastify: FastifyInstance) {
         method: 'PUT',
         url: '/:projectId',
         schema: {
-            body: updateProjectSchema,
+          description: 'Modify a specific project',
+          tags: ['project'],
+          summary: 'Modify information about a specific project',
+            body: {updateProjectSchema},
             params : projectParamsSchema,
             response: {}
           },
@@ -107,6 +119,9 @@ export async function projectsController (fastify: FastifyInstance) {
         method: 'DELETE',
         url: '/:projectId',
         schema: {
+            description: 'Delete a specific project',
+            tags: ['project'],
+            summary: 'Delete a specific project',
             params : projectParamsSchema
           },
         handler: async function (request, reply) {
