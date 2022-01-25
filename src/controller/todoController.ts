@@ -114,22 +114,23 @@ export async function todoItemsController (fastify: FastifyInstance) {
           }
         }
     });
-    //
-    // fastify.route<{ Body: TodoItem }>({
-    //     method: 'DELETE',
-    //     url: '/:todoItemId',
-    //     schema: {
-    //         params: todoItemIdSchema
-    //     },
-    //     handler: async function (request, reply) {
-    //       try {
-    //         const { todoItemId } = request.params as { todoItemId: string };
-    //         await todoItemCollection.doc(todoItemId).delete();
-    //
-    //         await reply.code(200).send();
-    //       } catch (e: any) {
-    //         return reply.code(404).send('To-do item not found');
-    //       }
-    //     }
-    // });
+
+    fastify.route<{ Body: TodoItem }>({
+        method: 'DELETE',
+        url: '/:todoItemId',
+        schema: {
+            params: projectTodoParamsSchema
+        },
+        handler: async function (request, reply) {
+          try {
+            const { projectId } = request.params as { projectId: string };
+            const { todoItemId } = request.params as { todoItemId: string };
+            await projectCollection.doc(projectId).collection('todo').doc(todoItemId).delete();
+
+            await reply.code(200).send();
+          } catch (e: any) {
+            return reply.code(404).send('To-do item not found');
+          }
+        }
+    });
   }
