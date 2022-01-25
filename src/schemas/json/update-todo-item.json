@@ -1,0 +1,25 @@
+{
+  "$id": "update-todo-item.json",
+  "$schema": "http://json-schema.org/schema",
+  "type": "object",
+  "required": [],
+  "additionalProperties": false,
+  "properties": {
+    "id": {"type":  "string", "description":"Id of the to-to item"},
+    "name": { "type": "string", "description": "Name of the to-do item (required)" },
+    "description": { "type": "string", "description": "Description of the to-do item" },
+    "supplyRequired": {
+      "description": "List of supplies required to complete the to-do item (required)",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["supplyRef", "quantity"],
+        "additionalProperties": false,
+        "properties": {
+          "supplyRef": { "type": "string" },
+          "quantity": { "type": "integer", "minimum": 0 }
+        }
+      }
+    }
+  }
+}

@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify'
 import { TodoItem } from "../schemas/types/todo-item";
 import * as admin from 'firebase-admin';
 import * as todoItemSchema from "../schemas/json/todo-item.json";
+import * as updateTodoItemSchema from "../schemas/json/update-todo-item.json";
 import * as idResponseSchema from '../schemas/json/id-response.json';
 
 const projectParamsSchema = {
@@ -95,23 +96,24 @@ export async function todoItemsController (fastify: FastifyInstance) {
         }
     });
 
-    // fastify.route<{ Body: TodoItem }>({
-    //     method: 'PUT',
-    //     url: '/:todoItemId',
-    //     schema: {
-    //         body: todoItemSchema,
-    //         params: todoItemIdSchema
-    //       },
-    //     handler: async function (request, reply) {
-    //       try {
-    //         const { todoItemId } = request.params as { todoItemId: string };
-    //         await todoItemCollection.doc(todoItemId).set(request.body);
-    //         await reply.code(200).send();
-    //       } catch (e: any) {
-    //         return reply.code(404).send('To-do item not found');
-    //       }
-    //     }
-    // });
+    fastify.route<{ Body: TodoItem }>({
+        method: 'PUT',
+        url: '/:todoItemId',
+        schema: {
+            body: updateTodoItemSchema,
+            params: projectTodoParamsSchema
+          },
+        handler: async function (request, reply) {
+          try {
+            const { projectId } = request.params as { projectId: string };
+            const { todoItemId } = request.params as { todoItemId: string };
+            await projectCollection.doc(projectId).collection('todo').doc(todoItemId).update(request.body);
+            await reply.code(200).send();
+          } catch (e: any) {
+            return reply.code(404).send('To-do item not found');
+          }
+        }
+    });
     //
     // fastify.route<{ Body: TodoItem }>({
     //     method: 'DELETE',
