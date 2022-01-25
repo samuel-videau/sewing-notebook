@@ -1,4 +1,4 @@
-import { FastifyInstance } from 'fastify'
+import { FastifyInstance } from 'fastify';
 import { Project } from "../schemas/types/project";
 import * as admin from 'firebase-admin';
 import * as projectSchema from "../schemas/json/project.json";
