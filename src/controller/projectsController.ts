@@ -25,12 +25,15 @@ export async function projectsController (fastify: FastifyInstance) {
       },
       handler: async (request, reply) => {
         try {
-          const project: Project = request.body;
-          const res = await projectCollection.add({name: project.name, description: project.description});
-          for (const todo of project.todo) {
-            await projectCollection.doc(res.id).collection('todo').add(todo);
-          }
-          await reply.code(200).send(res.id);
+          await admin.firestore().runTransaction(async (transaction) => {
+            const project: Project = request.body;
+            const projectDoc = projectCollection.doc();
+            transaction.create(projectDoc, {name: project.name, description: project.description})
+            for (const todo of project.todo) {
+              transaction.create(projectDoc.collection('todo').doc(), todo)
+            }
+            await reply.code(200).send(projectDoc.id);
+          });
         } catch (e) {
           return reply.code(500).send('Internal Error');
         }
