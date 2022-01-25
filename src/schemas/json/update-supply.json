@@ -1,5 +1,5 @@
 {
-  "$id": "optional-supply.json",
+  "$id": "update-supply.json",
   "$schema": "http://json-schema.org/schema",
   "type": "object",
   "required": [],
