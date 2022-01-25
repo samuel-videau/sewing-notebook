@@ -79,9 +79,9 @@ export async function todoItemsController (fastify: FastifyInstance) {
           },
         handler: async function (request, reply) {
           try {
-            const { todoItemId } = request.params as any;
-            await todoItemCollection.doc(todoItemId).set(request.body as TodoItem);
-            reply.code(200).send();
+            const { todoItemId } = request.params as { todoItemId: string };
+            await todoItemCollection.doc(todoItemId).set(request.body);
+            await reply.code(200).send();
           } catch (e: any) {
             return reply.code(404).send('To-do item not found');
           }
@@ -96,10 +96,10 @@ export async function todoItemsController (fastify: FastifyInstance) {
         },
         handler: async function (request, reply) {
           try {
-            const { todoItemId } = request.params as any;
-          await todoItemCollection.doc(todoItemId).delete();
-    
-          reply.code(200).send();
+            const { todoItemId } = request.params as { todoItemId: string };
+            await todoItemCollection.doc(todoItemId).delete();
+
+            await reply.code(200).send();
           } catch (e: any) {
             return reply.code(404).send('To-do item not found');
           }
