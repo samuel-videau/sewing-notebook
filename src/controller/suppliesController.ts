@@ -9,7 +9,7 @@ const suppliesParamsSchema = {
   type: 'object',
   required: ['supplyId'],
   properties: {
-      supplyId: { type: 'string' }
+      supplyId: { type: 'string', description: "Id of the supply" }
   }
 }
 
@@ -43,7 +43,10 @@ export async function suppliesController (fastify: FastifyInstance) {
     method: 'POST',
     url: '/',
     schema: {
-      body: supplySchema,
+      description: 'Create a supply',
+      tags: ['supply'],
+      summary: 'Create a supply',
+      body: {supplySchema},
       response: { 200: idResponseSchema}
     },
     handler: async (request, reply) => {
@@ -58,6 +61,9 @@ export async function suppliesController (fastify: FastifyInstance) {
     method: 'GET',
     url: '/:supplyId',
     schema: {
+      description: 'Get information about a specific supply',
+      tags: ['supply'],
+      summary: 'Get a specific supply',
       params : suppliesParamsSchema,
       response: { 200: supplySchema }
       },
@@ -77,7 +83,10 @@ export async function suppliesController (fastify: FastifyInstance) {
     method: 'PUT',
     url: '/:supplyId',
     schema: {
-      body: updateSupplySchema,
+      description: 'Modify a specific supply',
+      tags: ['supply'],
+      summary: 'Modify information about a specific supplies',
+      body: {updateSupplySchema},
       params: suppliesParamsSchema
       },
     handler: async (request, reply) => {
@@ -95,6 +104,9 @@ export async function suppliesController (fastify: FastifyInstance) {
     method: 'DELETE',
     url: '/:supplyId',
     schema: {
+        description: 'Delete a specific supply',
+        tags: ['supply'],
+        summary: 'Delete a specific supply',
         params : suppliesParamsSchema
       },
     handler: async function (request, reply) {
