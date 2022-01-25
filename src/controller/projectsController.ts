@@ -111,10 +111,16 @@ export async function projectsController (fastify: FastifyInstance) {
           },
         handler: async function (request, reply) {
           try {
-            const {projectId} = request.params as { projectId: string };
-            await projectCollection.doc(projectId).delete();
+            await admin.firestore().runTransaction(async transaction => {
+              const {projectId} = request.params as { projectId: string };
+              const todoEls = await projectCollection.doc(projectId).collection('todo').get();
+              todoEls.docs.forEach(todoEl => {
+                transaction.delete(todoEl.ref);
+              });
+              transaction.delete(projectCollection.doc(projectId));
 
-            await reply.code(200).send();
+              await reply.code(200).send();
+            });
           } catch (e: any) {
             return reply.code(500).send('Internal Error');
           }
