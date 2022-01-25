@@ -71,7 +71,7 @@ export async function suppliesController (fastify: FastifyInstance) {
       },
     handler: async (request, reply) => {
       try {
-        const supplyId: string = (request.params as {supplyId: string}).supplyId
+        const { supplyId } = request.params as { supplyId: string };
         const doc = await supplyCollection.doc(supplyId).get();
         return reply.code(200).send(JSON.stringify(doc.data() as Supply));
       } catch (e: any) {
@@ -89,9 +89,9 @@ export async function suppliesController (fastify: FastifyInstance) {
       },
     handler: async (request, reply) => {
       try {
-        const { supplyId } = request.params as any;
-        await supplyCollection.doc(supplyId).set(request.body as Supply);
-        reply.code(200).send();
+        const { supplyId } = request.params as { supplyId: string };
+        await supplyCollection.doc(supplyId).set(request.body);
+        await reply.code(200).send();
       } catch (e: any) {
         return reply.code(404).send('Supply not found');
       }
@@ -106,10 +106,10 @@ export async function suppliesController (fastify: FastifyInstance) {
       },
     handler: async function (request, reply) {
       try {
-        const { supplyId } = request.params as any;
-      await supplyCollection.doc(supplyId).delete();
+        const { supplyId } = request.params as { supplyId: string };
+        await supplyCollection.doc(supplyId).delete();
 
-      reply.code(200).send();
+        await reply.code(200).send();
       } catch (e: any) {
         return reply.code(404).send('Supply not found');
       }

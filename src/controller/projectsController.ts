@@ -2,7 +2,6 @@ import { FastifyInstance } from 'fastify'
 import { Project } from "../schemas/types/project";
 import * as admin from 'firebase-admin';
 import * as projectSchema from "../schemas/json/project.json";
-import { RawReplyDefaultExpression, RawRequestDefaultExpression, RawServerDefault, RouteHandler, RouteHandlerMethod, RouteOptions } from "fastify";
 
 const projectParamsSchema = {
     type: 'object',
@@ -23,8 +22,8 @@ export async function projectsController (fastify: FastifyInstance) {
         response: { 200: projectSchema },
       },
       handler: async (request, reply) => {
-        const newProject =  await projectCollection.add(request.body as Project);
-        reply.code(200).send( (await newProject.get()).data() as Project );
+        const newProject =  await projectCollection.add(request.body);
+        await reply.code(200).send((await newProject.get()).data() as Project );
       }
     });
 
@@ -40,7 +39,7 @@ export async function projectsController (fastify: FastifyInstance) {
           },
         handler: async function (request, reply) {
             const projects = await projectCollection.get();
-            reply.code(200).send( projects.docs.map(project => project.data() as Project) );
+            await reply.code(200).send( projects.docs.map(project => project.data() as Project) );
         }
       });
 
@@ -52,9 +51,9 @@ export async function projectsController (fastify: FastifyInstance) {
         params : projectParamsSchema
     },
     handler: async function (request, reply) {
-        const { projectId } = request.params as any;
+        const { projectId } = request.params as { projectId: string };
         const project = await projectCollection.doc(projectId).get();
-        reply.code(200).send(project.data() as Project);
+        await reply.code(200).send(project.data() as Project);
     }
     });
 
@@ -67,10 +66,10 @@ export async function projectsController (fastify: FastifyInstance) {
             response: {}
           },
         handler: async function (request, reply) {
-            const { projectId } = request.params as any;
-            await projectCollection.doc(projectId).set(request.body as Project);
+            const { projectId } = request.params as { projectId: string };
+            await projectCollection.doc(projectId).set(request.body);
 
-            reply.code(200).send();
+            await reply.code(200).send();
         }
     });
 
@@ -81,10 +80,10 @@ export async function projectsController (fastify: FastifyInstance) {
             params : projectParamsSchema
           },
         handler: async function (request, reply) {
-            const { projectId } = request.params as any;
+            const { projectId } = request.params as { projectId: string };
             await projectCollection.doc(projectId).delete();
 
-            reply.code(200).send();
+            await reply.code(200).send();
         }
     });
   }
