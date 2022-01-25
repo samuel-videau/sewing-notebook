@@ -20,6 +20,15 @@ const todoItemIdSchema = {
     }
 }
 
+const projectTodoParamsSchema = {
+  type: 'object',
+  required: ['todoItemId', 'projectId'],
+  properties: {
+    projectId: { type: 'string' },
+    todoItemId: { type: 'string' }
+  }
+}
+
 export async function todoItemsController (fastify: FastifyInstance) {
     const projectCollection = admin.firestore().collection('project');
 
@@ -59,25 +68,27 @@ export async function todoItemsController (fastify: FastifyInstance) {
           });
         }
       });
-    //
-    // fastify.route<{ Body: TodoItem }>({
-    //     method: 'GET',
-    //     url: '/:todoItemId',
-    //     schema: {
-    //         response: { 200: todoItemSchema },
-    //         params: todoItemIdSchema
-    //       },
-    //     handler: async function (request, reply) {
-    //       try {
-    //         const todoItemId: string = (request.params as {supplyId: string}).supplyId
-    //         const doc = await todoItemCollection.doc(todoItemId).get();
-    //         return reply.code(200).send(JSON.stringify(doc.data() as TodoItem));
-    //       } catch (e: any) {
-    //         return reply.code(404).send('To-do item not found');
-    //       }
-    //     }
-    // });
-    //
+
+    fastify.route<{ Body: TodoItem }>({
+        method: 'GET',
+        url: '/:todoItemId',
+        schema: {
+            response: { 200: todoItemSchema },
+            params: projectTodoParamsSchema
+          },
+        handler: async function (request, reply) {
+          try {
+            const { projectId } = request.params as { projectId: string };
+            const { todoItemId } = request.params as { todoItemId: string };
+            const doc = await projectCollection.doc(projectId).collection('todo').doc(todoItemId).get();
+            if (!doc.exists) return reply.code(404).send('Item not Found');
+            return reply.code(200).send(JSON.stringify(doc.data() as TodoItem));
+          } catch (e: any) {
+            return reply.code(500).send('Internal Error');
+          }
+        }
+    });
+
     // fastify.route<{ Body: TodoItem }>({
     //     method: 'PUT',
     //     url: '/:todoItemId',
