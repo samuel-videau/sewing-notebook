@@ -110,7 +110,7 @@ export async function todoItemsController (fastify: FastifyInstance) {
             await projectCollection.doc(projectId).collection('todo').doc(todoItemId).update(request.body);
             await reply.code(200).send();
           } catch (e: any) {
-            return reply.code(404).send('To-do item not found');
+            return reply.code(500).send('Internal Error');
           }
         }
     });
@@ -133,4 +133,40 @@ export async function todoItemsController (fastify: FastifyInstance) {
           }
         }
     });
+
+
+  fastify.route<{ Body: TodoItem }>({
+    method: 'PUT',
+    url: '/:todoItemId/complete',
+    schema: {
+      params: projectTodoParamsSchema
+    },
+    handler: async function (request, reply) {
+      try {
+        await admin.firestore().runTransaction(async transaction => {
+          const { projectId } = request.params as { projectId: string };
+          const { todoItemId } = request.params as { todoItemId: string };
+
+          const doc = await projectCollection.doc(projectId).collection('todo').doc(todoItemId).get();
+          if (!doc.exists) return reply.code(404).send('Not Found');
+
+          for (const supplyRequired of (doc.data() as TodoItem).supplyRequired) {
+            transaction.update(
+              admin.firestore().collection('supply').doc(supplyRequired.supplyRef),
+              {quantityLeft: admin.firestore.FieldValue.increment(-supplyRequired.quantity)}
+            );
+          }
+
+          transaction.update(
+            projectCollection.doc(projectId).collection('todo').doc(todoItemId),
+            {completed: true}
+          );
+
+          return reply.code(200).send();
+        });
+      } catch (e: any) {
+        return reply.code(500).send('Internal Error');
+      }
+    }
+  });
   }
