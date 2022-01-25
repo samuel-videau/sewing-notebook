@@ -39,22 +39,26 @@ export async function todoItemsController (fastify: FastifyInstance) {
         return reply.code(200).send(res.id);
       }
     });
-    //
-    // fastify.route<{ Body: TodoItem }>({
-    //     method: 'GET',
-    //     url: '/',
-    //     schema: {
-    //         response: { 200: {
-    //             "type": "array",
-    //             "items": todoItemSchema
-    //           }
-    //         }
-    //       },
-    //     handler: async function (request, reply) {
-    //         const todoItems = await todoItemCollection.get();
-    //         return todoItems.docs.map(todo => todo.data() as TodoItem);
-    //     }
-    //   });
+
+    fastify.route<{ Body: TodoItem }>({
+        method: 'GET',
+        url: '/',
+        schema: {
+          params : projectParamsSchema,
+          response: { 200: {
+                "type": "array",
+                "items": todoItemSchema
+              }
+            }
+          },
+        handler: async function (request, reply) {
+          const { projectId } = request.params as { projectId: string };
+          const todoItems = await projectCollection.doc(projectId).collection('todo').get();
+          return todoItems.docs.map(todo => {
+            return {...todo.data() as TodoItem, id: todo.id}
+          });
+        }
+      });
     //
     // fastify.route<{ Body: TodoItem }>({
     //     method: 'GET',
