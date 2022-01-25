@@ -1,0 +1,14 @@
+{
+  "$id": "optional-supply.json",
+  "$schema": "http://json-schema.org/schema",
+  "type": "object",
+  "required": [],
+  "additionalProperties": false,
+  "properties": {
+    "name": { "type": "string" },
+    "description": { "type": "string" },
+    "type": { "type": "string" },
+    "color": { "type": "string" },
+    "quantityLeft": { "type": "integer", "minimum": 0 }
+  }
+}
