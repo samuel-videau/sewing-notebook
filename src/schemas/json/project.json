@@ -2,7 +2,7 @@
   "$id": "project.json",
   "$schema": "http://json-schema.org/schema",
   "type": "object",
-  "required": ["name", "todo"],
+  "required": ["name"],
   "additionalProperties": false,
   "properties": {
     "name": { "type": "string" },
