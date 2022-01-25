@@ -5,7 +5,7 @@
   "required": ["name", "completed", "supplyRequired"],
   "additionalProperties": false,
   "properties": {
-    "id": {"type":  "string"},
+    "id": {"type":  "string", "description":"Id of the to-to item"},
     "name": { "type": "string", "description": "Name of the to-do item (required)" },
     "description": { "type": "string", "description": "Description of the to-do item" },
     "completed": { "type": "boolean", "description": "Whether the to-do item has been completed (required)" },
