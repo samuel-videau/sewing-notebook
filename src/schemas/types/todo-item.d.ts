@@ -3,7 +3,7 @@ export interface TodoItem {
   description?: string
   completed: boolean
   supplyRequired: {
-    supplyRef: unknown
+    supplyRef: string
     quantity: number
   }[]
 }

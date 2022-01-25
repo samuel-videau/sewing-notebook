@@ -1,0 +1,11 @@
+{
+  "$id": "project.json",
+  "$schema": "http://json-schema.org/schema",
+  "type": "object",
+  "required": [],
+  "additionalProperties": false,
+  "properties": {
+    "name": { "type": "string" },
+    "description": { "type": "string" }
+  }
+}

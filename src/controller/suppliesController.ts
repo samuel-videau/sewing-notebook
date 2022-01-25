@@ -2,7 +2,8 @@ import { FastifyInstance } from 'fastify'
 import {Supply} from "../schemas/types/supply";
 import * as admin from 'firebase-admin';
 import * as supplySchema from '../schemas/json/supply.json';
-import * as optionalSupplySchema from '../schemas/json/optional-supply.json';
+import * as updateSupplySchema from '../schemas/json/update-supply.json';
+import * as idResponseSchema from '../schemas/json/id-response.json';
 
 const suppliesParamsSchema = {
   type: 'object',
@@ -14,8 +15,6 @@ const suppliesParamsSchema = {
 
 export async function suppliesController (fastify: FastifyInstance) {
   const supplyCollection = admin.firestore().collection('supply');
-
-
 
   fastify.route<{ Body: Supply }>({
     method: 'GET',
@@ -44,19 +43,10 @@ export async function suppliesController (fastify: FastifyInstance) {
     url: '/',
     schema: {
       body: supplySchema,
-      response: { 200: {
-          "type": "object",
-          "required": ["id"],
-          "additionalProperties": false,
-          "properties": {
-            "name": {"id": "string"}
-          }
-        }
-      }
+      response: { 200: idResponseSchema}
     },
     handler: async (request, reply) => {
-      const supply: Supply = request.body;
-      const res = await supplyCollection.add(supply);
+      const res = await supplyCollection.add(request.body);
       return reply.code(200).send(res.id);
     }
   });
@@ -86,7 +76,7 @@ export async function suppliesController (fastify: FastifyInstance) {
     method: 'PUT',
     url: '/:supplyId',
     schema: {
-      body: optionalSupplySchema,
+      body: updateSupplySchema,
       params: suppliesParamsSchema
       },
     handler: async (request, reply) => {
