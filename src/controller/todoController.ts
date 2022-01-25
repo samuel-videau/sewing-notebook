@@ -7,7 +7,7 @@ const todoItemIdSchema = {
     type: 'object',
     required: ['todoItemId'],
     properties: {
-      todoItemId: { type: 'string' }
+      todoItemId: { type: 'string', description: 'Id of the to-do item' }
     }
 }
 
@@ -18,7 +18,10 @@ export async function todoItemsController (fastify: FastifyInstance) {
       method: 'POST',
       url: '/',
       schema: {
-        body: todoItemSchema,
+        description: 'Create a to-do item',
+        tags: ['to-do'],
+        summary: 'Create a to-do item',
+        body: {todoItemSchema},
         response: { 200: {
             "type": "object",
             "required": ["id"],
@@ -40,6 +43,9 @@ export async function todoItemsController (fastify: FastifyInstance) {
         method: 'GET',
         url: '/',
         schema: {
+            description: 'Get the list of all to-do items',
+            tags: ['to-do'],
+            summary: 'Get all to-do items',
             response: { 200: {
                 "type": "array",
                 "items": todoItemSchema
@@ -56,6 +62,9 @@ export async function todoItemsController (fastify: FastifyInstance) {
         method: 'GET',
         url: '/:todoItemId',
         schema: {
+            description: 'Get information about a specific to-do item',
+            tags: ['to-do'],
+            summary: 'Get a specific to-do item',
             response: { 200: todoItemSchema },
             params: todoItemIdSchema
           },
@@ -74,7 +83,10 @@ export async function todoItemsController (fastify: FastifyInstance) {
         method: 'PUT',
         url: '/:todoItemId',
         schema: {
-            body: todoItemSchema,
+            description: 'Modify a specific to-do item',
+            tags: ['to-do'],
+            summary: 'Modify information about a specific to-do item',
+            body: {todoItemSchema},
             params: todoItemIdSchema
           },
         handler: async function (request, reply) {
@@ -92,6 +104,9 @@ export async function todoItemsController (fastify: FastifyInstance) {
         method: 'DELETE',
         url: '/:todoItemId',
         schema: {
+            description: 'Delete a specific to-do item',
+            tags: ['to-do'],
+            summary: 'Delete a specific to-do item',
             params: todoItemIdSchema
         },
         handler: async function (request, reply) {

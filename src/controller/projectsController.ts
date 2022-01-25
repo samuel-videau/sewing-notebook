@@ -9,7 +9,7 @@ const projectParamsSchema = {
     type: 'object',
     required: ['projectId'],
     properties: {
-        projectId: { type: 'string' }
+        projectId: { type: 'string', description: 'Id of the project' }
     }
 }
 
@@ -119,9 +119,9 @@ export async function projectsController (fastify: FastifyInstance) {
         method: 'DELETE',
         url: '/:projectId',
         schema: {
-            description: 'Delete a specific supply',
+            description: 'Delete a specific project',
             tags: ['project'],
-            summary: 'Delete a specific supply',
+            summary: 'Delete a specific project',
             params : projectParamsSchema
           },
         handler: async function (request, reply) {
