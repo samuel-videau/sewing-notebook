@@ -27,11 +27,8 @@ export async function suppliesController (fastify: FastifyInstance) {
       }
     },
     handler: async (request, reply) => {
-      const docs = await supplyCollection.get();
-      const supplies: Supply[] = [];
-      docs.forEach(doc => {
-        supplies.push(doc.data() as Supply);
-      });
+      const data = await supplyCollection.get();
+      const supplies = data.docs.map(doc => {return {...doc.data() as Supply, id: doc.id}})
       return reply.code(200).send(supplies);
     }
   });

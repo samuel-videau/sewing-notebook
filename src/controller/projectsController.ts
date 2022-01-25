@@ -28,9 +28,11 @@ export async function projectsController (fastify: FastifyInstance) {
           await admin.firestore().runTransaction(async (transaction) => {
             const project: Project = request.body;
             const projectDoc = projectCollection.doc();
-            transaction.create(projectDoc, {name: project.name, description: project.description})
-            for (const todo of project.todo) {
-              transaction.create(projectDoc.collection('todo').doc(), todo)
+            transaction.create(projectDoc, {name: project.name, description: project.description});
+            if (project.todo) {
+              for (const todo of project.todo) {
+                transaction.create(projectDoc.collection('todo').doc(), todo)
+              }
             }
             await reply.code(200).send(projectDoc.id);
           });
@@ -52,8 +54,11 @@ export async function projectsController (fastify: FastifyInstance) {
           },
         handler: async function (request, reply) {
           try {
-            const projects = await projectCollection.get();
-            await reply.code(200).send(projects.docs.map(project => project.data() as Project));
+            const data = await projectCollection.get();
+            const projects = data.docs.map(project => {
+              return {...project.data() as Project, id: project.id}
+            });
+            await reply.code(200).send(projects);
           } catch (e) {
             return reply.code(500).send('Internal Error');
           }

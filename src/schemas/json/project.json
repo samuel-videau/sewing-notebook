@@ -5,6 +5,7 @@
   "required": ["name"],
   "additionalProperties": false,
   "properties": {
+    "id": {"type":  "string"},
     "name": { "type": "string" },
     "description": { "type": "string" },
     "todo": {

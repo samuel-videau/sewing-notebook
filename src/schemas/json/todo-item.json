@@ -5,6 +5,7 @@
   "required": ["name", "completed", "supplyRequired"],
   "additionalProperties": false,
   "properties": {
+    "id": {"type":  "string"},
     "name": { "type": "string" },
     "description": { "type": "string" },
     "completed": { "type": "boolean" },
