@@ -3,14 +3,14 @@ CREATE DATABASE sewing;
 use sewing;
 
 CREATE TABLE `projects` (
-  `id` int NOT NULL DEFAULT '0',
+  `id` int NOT NULL,
   `name` varchar(45) DEFAULT NULL,
   `description` varchar(135) DEFAULT NULL,
   PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `sewing`.`supplies` (
-  `id` INT NOT NULL DEFAULT 0,
+CREATE TABLE `supplies` (
+  `id` INT NOT NULL,
   `name` VARCHAR(45) NULL,
   `description` VARCHAR(130) NULL,
   `quantity` INT NULL,
@@ -18,28 +18,33 @@ CREATE TABLE `sewing`.`supplies` (
   `color` VARCHAR(10) NULL,
   PRIMARY KEY (`id`));
 
-  CREATE TABLE `todos` (
-  `id` int NOT NULL,
-  `project_id` int NOT NULL,
+
+CREATE TABLE `todos` (
+  `id` int NOT NULL DEFAULT 0,
+  `projectId` int NOT NULL,
   `name` varchar(45) DEFAULT NULL,
   `description` varchar(135) DEFAULT NULL,
+  `completed` TINYINT NULL,
   PRIMARY KEY (`id`));
+
 
 ALTER TABLE `todos`
 ADD CONSTRAINT fk_projectid
-FOREIGN KEY (project_id) REFERENCES projects(id);
+FOREIGN KEY (projectId) REFERENCES projects(id) ON DELETE CASCADE;
 
 CREATE TABLE `supplies_required` (
-  `id` INT NOT NULL,
-  `todo_id` INT NOT NULL,
-  `supply_id` INT NOT NULL,
-  `quantity` INT NULL,
+  `id` int NOT NULL,
+  `todoId` int NOT NULL,
+  `supplyId` int NOT NULL,
+  `quantity` int DEFAULT NULL,
   PRIMARY KEY (`id`));
+
 
 ALTER TABLE `supplies_required`
 ADD CONSTRAINT fk_todoid
-FOREIGN KEY (todo_id) REFERENCES todos(id);
+FOREIGN KEY (todoId) REFERENCES todos(id) ON DELETE CASCADE;
 
 ALTER TABLE `supplies_required`
 ADD CONSTRAINT fk_supplyid
-FOREIGN KEY (supply_id) REFERENCES supplies(id);
+FOREIGN KEY (supplyId) REFERENCES supplies(id);
+

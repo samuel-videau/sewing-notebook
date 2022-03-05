@@ -1,9 +1,17 @@
 import { FastifyInstance } from 'fastify';
 import { Project } from "../schemas/types/project";
-import * as admin from 'firebase-admin';
 import * as projectSchema from "../schemas/json/project.json";
 import * as updateProjectSchema from "../schemas/json/update-project.json";
-import * as idResponseSchema from '../schemas/json/id-response.json';
+import {logError} from "../bin/logger";
+import {commitTransaction, rollbackTransaction, startTransaction} from "../bin/DB/mysql";
+import {deleteProject, editProject, insertProject, queryAllProjects, queryProject} from "../bin/DB/projects.table";
+import {error, ERROR_INTERNAL} from "../bin/utils/error-messages";
+import {insertTodo, queryAllTodosOfProject} from "../bin/DB/todos.table";
+import {TodoItem} from "../schemas/types/todo-item";
+import {
+  insertSupplyRequired,
+  queryAllSuppliesRequiredOfTodo,
+} from "../bin/DB/suppliesRequired.table";
 
 const projectParamsSchema = {
     type: 'object',
@@ -14,8 +22,6 @@ const projectParamsSchema = {
 }
 
 export async function projectsController (fastify: FastifyInstance) {
-    const projectCollection = admin.firestore().collection('project');
-
     fastify.route<{ Body: Project }>({
       method: 'POST',
       url: '/',
@@ -24,23 +30,36 @@ export async function projectsController (fastify: FastifyInstance) {
         tags: ['project'],
         summary: 'Create a project',
         body: projectSchema,
-        response: { 200: idResponseSchema },
+        response: { 200: projectSchema },
       },
       handler: async (request, reply) => {
         try {
-          await admin.firestore().runTransaction(async (transaction) => {
-            const project: Project = request.body;
-            const projectDoc = projectCollection.doc();
-            transaction.create(projectDoc, {name: project.name, description: project.description});
-            if (project.todo) {
-              for (const todo of project.todo) {
-                transaction.create(projectDoc.collection('todo').doc(), todo)
+          const project: Project = request.body;
+          await startTransaction();
+          const projectId = await insertProject(project.name, project.description);
+          project.id = projectId;
+          if (project.todo) {
+            for (let i = 0 ; i < project.todo.length ; i++) {
+              const todoItem: TodoItem = project.todo[i];
+              todoItem.id = await insertTodo(projectId, todoItem.name, todoItem.description, todoItem.completed);
+
+              if (todoItem.suppliesRequired) {
+                for (let j = 0 ; j < todoItem.suppliesRequired.length ; j++) {
+                  const supplyRequired = todoItem.suppliesRequired[j];
+                  supplyRequired.id = await insertSupplyRequired(todoItem.id, supplyRequired.supplyId, supplyRequired.quantity);
+                  todoItem.suppliesRequired[j] = supplyRequired;
+                }
               }
+              project.todo[i] = todoItem;
             }
-            await reply.code(200).send(projectDoc.id);
-          });
+          }
+
+          await commitTransaction();
+          await reply.code(200).send({projectId, ...project});
         } catch (e) {
-          return reply.code(500).send('Internal Error');
+          await rollbackTransaction();
+          logError(e);
+          return reply.code(500).send(error(500, ERROR_INTERNAL));
         }
       }
     });
@@ -60,13 +79,11 @@ export async function projectsController (fastify: FastifyInstance) {
           },
         handler: async function (request, reply) {
           try {
-            const data = await projectCollection.get();
-            const projects = data.docs.map(project => {
-              return {...project.data() as Project, id: project.id}
-            });
+            const projects: Project[] = await queryAllProjects();
             await reply.code(200).send(projects);
           } catch (e) {
-            return reply.code(500).send('Internal Error');
+            logError(e);
+            return reply.code(500).send(error(500, ERROR_INTERNAL));
           }
         }
       });
@@ -84,9 +101,21 @@ export async function projectsController (fastify: FastifyInstance) {
     handler: async function (request, reply) {
       try {
         const {projectId} = request.params as { projectId: string };
-        const project = await projectCollection.doc(projectId).get();
-        await reply.code(200).send(project.data() as Project);
+        const project: Project = await queryProject(projectId);
+        const todo: TodoItem[] = await queryAllTodosOfProject(projectId);
+        if (todo) {
+          project.todo = todo;
+          for (let i = 0 ; i < todo.length; i++) {
+            const todoItem = project.todo[i];
+            if (todoItem.id) todoItem.suppliesRequired = await queryAllSuppliesRequiredOfTodo(todoItem.id);
+            project.todo[i] = todoItem;
+          }
+        }
+
+        console.log(project)
+        return reply.code(200).send(project);
       } catch (e: any) {
+        logError(e);
         return reply.code(500).send('Internal Error');
       }
     }
@@ -106,7 +135,7 @@ export async function projectsController (fastify: FastifyInstance) {
         handler: async function (request, reply) {
           try {
             const { projectId } = request.params as { projectId: string };
-            await projectCollection.doc(projectId).update(request.body);
+            await editProject(projectId, request.body.name, request.body.description);
 
             await reply.code(200).send();
           }  catch(e: any) {
@@ -126,16 +155,9 @@ export async function projectsController (fastify: FastifyInstance) {
           },
         handler: async function (request, reply) {
           try {
-            await admin.firestore().runTransaction(async transaction => {
-              const {projectId} = request.params as { projectId: string };
-              const todoEls = await projectCollection.doc(projectId).collection('todo').get();
-              todoEls.docs.forEach(todoEl => {
-                transaction.delete(todoEl.ref);
-              });
-              transaction.delete(projectCollection.doc(projectId));
-
-              await reply.code(200).send();
-            });
+            const { projectId } = request.params as { projectId: string };
+            await deleteProject(projectId);
+            await reply.code(200).send();
           } catch (e: any) {
             return reply.code(500).send('Internal Error');
           }

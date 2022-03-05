@@ -16,7 +16,7 @@
         "required": ["supplyRef", "quantity"],
         "additionalProperties": false,
         "properties": {
-          "supplyRef": { "type": "string" },
+          "supplyId": { "type": "string" },
           "quantity": { "type": "integer", "minimum": 0 }
         }
       }

@@ -1,9 +1,9 @@
 import { FastifyInstance } from 'fastify'
 import {Supply} from "../schemas/types/supply";
-import * as admin from 'firebase-admin';
 import * as supplySchema from '../schemas/json/supply.json';
-import * as updateSupplySchema from '../schemas/json/update-supply.json';
-import * as idResponseSchema from '../schemas/json/id-response.json';
+import {logError} from "../bin/logger";
+import {error, ERROR_INTERNAL} from "../bin/utils/error-messages";
+import {deleteSupply, editSupply, insertSupply, queryAllSupplies, querySupply} from "../bin/DB/supplies.table";
 
 const suppliesParamsSchema = {
   type: 'object',
@@ -14,8 +14,6 @@ const suppliesParamsSchema = {
 }
 
 export async function suppliesController (fastify: FastifyInstance) {
-  const supplyCollection = admin.firestore().collection('supply');
-
 
   fastify.route<{ Body: Supply }>({
     method: 'POST',
@@ -25,11 +23,17 @@ export async function suppliesController (fastify: FastifyInstance) {
       tags: ['supply'],
       summary: 'Create a supply',
       body: supplySchema,
-      response: { 200: idResponseSchema}
+      response: { 200: supplySchema}
     },
     handler: async (request, reply) => {
-      const res = await supplyCollection.add(request.body);
-      return reply.code(200).send(res.id);
+      try {
+        const supply: Supply = request.body;
+        supply.id = await insertSupply(supply.name, supply.description, supply.quantity, supply.type, supply.color);
+        return reply.code(200).send(supply);
+      } catch (e) {
+        logError(e)
+        return reply.code(500).send(error(500, ERROR_INTERNAL));
+      }
     }
   });
 
@@ -48,13 +52,11 @@ export async function suppliesController (fastify: FastifyInstance) {
       }
     },
     handler: async (request, reply) => {
-      const data = await supplyCollection.get();
-      const supplies = data.docs.map(doc => {return {...doc.data() as Supply, id: doc.id}})
+      const supplies = await queryAllSupplies();
       return reply.code(200).send(supplies);
     }
   });
 
-  // TODO verify response properly
   fastify.route<{ Body: Supply }>({
     method: 'GET',
     url: '/:supplyId',
@@ -68,10 +70,10 @@ export async function suppliesController (fastify: FastifyInstance) {
     handler: async (request, reply) => {
       try {
         const { supplyId } = request.params as { supplyId: string };
-        const doc = await supplyCollection.doc(supplyId).get();
-        if (!doc.data()) return reply.code(404).send('Supply not found');
-        return reply.code(200).send(JSON.stringify(doc.data() as Supply));
+        const supply = await querySupply(supplyId);
+        return reply.code(200).send(supply);
       } catch (e: any) {
+        logError(e);
         return reply.code(500).send('Internal Error');
       }
     }
@@ -84,13 +86,13 @@ export async function suppliesController (fastify: FastifyInstance) {
       description: 'Modify a specific supply',
       tags: ['supply'],
       summary: 'Modify information about a specific supply',
-      body: updateSupplySchema,
+      body: supplySchema,
       params: suppliesParamsSchema
       },
     handler: async (request, reply) => {
       try {
         const { supplyId } = request.params as { supplyId: string };
-        await supplyCollection.doc(supplyId).update(request.body);
+        await editSupply(supplyId, request.body.name, request.body.description, request.body.quantity, request.body.type, request.body.color)
         await reply.code(200).send();
       } catch (e: any) {
         return reply.code(500).send('Internal Error');
@@ -110,7 +112,7 @@ export async function suppliesController (fastify: FastifyInstance) {
     handler: async function (request, reply) {
       try {
         const { supplyId } = request.params as { supplyId: string };
-        await supplyCollection.doc(supplyId).delete();
+        await deleteSupply(supplyId);
         await reply.code(200).send();
       } catch (e: any) {
         return reply.code(500).send('Internal Error');
