@@ -9,6 +9,8 @@ import * as todoItemSchema from '../schemas/json/todo-item.json';
 import * as supplySchema from '../schemas/json/supply.json';
 import * as updateProjectSchema from '../schemas/json/update-project.json';
 import * as updateTodoItemSchema from '../schemas/json/update-todo-item.json';
+import {authController} from "../controller/authController";
+import {usersController} from "../controller/usersController";
 
 export const fastify = fastifyFactory({ logger: false })
   .register(fastifySwagger, {
@@ -59,5 +61,7 @@ export const fastify = fastifyFactory({ logger: false })
   .addSchema(updateTodoItemSchema)
   .register(suppliesController, { prefix: '/supplies' })
   .register(projectsController, { prefix: '/projects' })
+  .register(authController, { prefix: '/auth' })
+  .register(usersController, { prefix: '/users' })
   .register(todoItemsController, {prefix: '/projects/:projectId/todo'});
 
