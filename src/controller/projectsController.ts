@@ -5,13 +5,14 @@ import * as updateProjectSchema from "../schemas/json/update-project.json";
 import {logError} from "../bin/logger";
 import {commitTransaction, rollbackTransaction, startTransaction} from "../bin/DB/mysql";
 import {deleteProject, editProject, insertProject, queryAllProjects, queryProject} from "../bin/DB/projects.table";
-import {error, ERROR_INTERNAL} from "../bin/utils/error-messages";
+import {error, ERROR_INTERNAL, ERROR_PROJECT_NOT_FOUND, ERROR_SUPPLY_NOT_FOUND} from "../bin/utils/error-messages";
 import {insertTodo, queryAllTodosOfProject} from "../bin/DB/todos.table";
 import {TodoItem} from "../schemas/types/todo-item";
 import {
   insertSupplyRequired,
   queryAllSuppliesRequiredOfTodo,
 } from "../bin/DB/suppliesRequired.table";
+import {MysqlError} from "mysql";
 
 const projectParamsSchema = {
     type: 'object',
@@ -59,6 +60,7 @@ export async function projectsController (fastify: FastifyInstance) {
         } catch (e) {
           await rollbackTransaction();
           logError(e);
+          if ((e as MysqlError).errno === 1452) return reply.code(404).send(error(404, ERROR_SUPPLY_NOT_FOUND))
           return reply.code(500).send(error(500, ERROR_INTERNAL));
         }
       }
@@ -80,7 +82,7 @@ export async function projectsController (fastify: FastifyInstance) {
         handler: async function (request, reply) {
           try {
             const projects: Project[] = await queryAllProjects();
-            await reply.code(200).send(projects);
+            return reply.code(200).send(projects);
           } catch (e) {
             logError(e);
             return reply.code(500).send(error(500, ERROR_INTERNAL));
@@ -103,6 +105,9 @@ export async function projectsController (fastify: FastifyInstance) {
         const {projectId} = request.params as { projectId: string };
         const project: Project = await queryProject(projectId);
         const todo: TodoItem[] = await queryAllTodosOfProject(projectId);
+
+        if (!project) return reply.code(404).send(error(404, ERROR_PROJECT_NOT_FOUND));
+
         if (todo) {
           project.todo = todo;
           for (let i = 0 ; i < todo.length; i++) {
@@ -112,7 +117,6 @@ export async function projectsController (fastify: FastifyInstance) {
           }
         }
 
-        console.log(project)
         return reply.code(200).send(project);
       } catch (e: any) {
         logError(e);
@@ -136,9 +140,10 @@ export async function projectsController (fastify: FastifyInstance) {
           try {
             const { projectId } = request.params as { projectId: string };
             await editProject(projectId, request.body.name, request.body.description);
-
             await reply.code(200).send();
           }  catch(e: any) {
+            logError(e);
+            if (e === ERROR_PROJECT_NOT_FOUND) return reply.code(404).send(error(404, ERROR_PROJECT_NOT_FOUND));
             return reply.code(500).send('Internal Error');
           }
         }
@@ -159,6 +164,8 @@ export async function projectsController (fastify: FastifyInstance) {
             await deleteProject(projectId);
             await reply.code(200).send();
           } catch (e: any) {
+            logError(e);
+            if (e === ERROR_PROJECT_NOT_FOUND) return reply.code(404).send(error(404, ERROR_PROJECT_NOT_FOUND));
             return reply.code(500).send('Internal Error');
           }
         }

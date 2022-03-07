@@ -1,6 +1,7 @@
 import {executeQuery} from "./mysql";
 import {TodoItem} from "../../schemas/types/todo-item";
 import {generateId} from "../utils/generate-id";
+import {ERROR_TODO_NOT_FOUND} from "../utils/error-messages";
 
 export async function queryAllTodosOfProject(projectId: string): Promise<TodoItem[]> {
   return await executeQuery('SELECT * FROM todos WHERE projectId = ' + projectId + ';') as TodoItem[];
@@ -13,11 +14,17 @@ export async function insertTodo(projectId: string, name: string, description: s
 }
 
 export async function editTodo(id: string, name: string, description: string): Promise<void> {
-  await executeQuery('UPDATE todos SET name = \'' + name + '\', description = \'' + description + '\' WHERE id = ' + id + ';');
+  /* eslint-disable */
+  const res = await executeQuery('UPDATE todos SET name = \'' + name + '\', description = \'' + description + '\' WHERE id = ' + id + ';');
+  if (res.changedRows === 0) throw(ERROR_TODO_NOT_FOUND);
+  /* eslint-enable */
 }
 
 export async function completeTodo(id: string): Promise<void> {
-  await executeQuery('UPDATE todos SET completed = true WHERE id = ' + id + ';');
+  /* eslint-disable */
+  const res = await executeQuery('UPDATE todos SET completed = true WHERE id = ' + id + ';');
+  if (res.changedRows === 0) throw(ERROR_TODO_NOT_FOUND);
+  /* eslint-enable */
 }
 
 export async function queryTodo(id: string): Promise<TodoItem> {
@@ -26,5 +33,8 @@ export async function queryTodo(id: string): Promise<TodoItem> {
 }
 
 export async function deleteTodo(id: string): Promise<void> {
-  await executeQuery('DELETE FROM todos WHERE id = ' + id + ';');
+  /* eslint-disable */
+  const res = await executeQuery('DELETE FROM todos WHERE id = ' + id + ';');
+  if (res.affectedRows === 0) throw(ERROR_TODO_NOT_FOUND);
+  /* eslint-enable */
 }

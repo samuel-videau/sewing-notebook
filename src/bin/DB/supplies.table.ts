@@ -1,6 +1,7 @@
 import {executeQuery} from "./mysql";
 import {Supply} from "../../schemas/types/supply";
 import {generateId} from "../utils/generate-id";
+import {ERROR_SUPPLY_NOT_FOUND} from "../utils/error-messages";
 
 export async function queryAllSupplies(): Promise<Supply[]> {
   return await executeQuery('SELECT * FROM supplies;') as Supply[];
@@ -14,9 +15,12 @@ export async function insertSupply(name: string, description: string, quantityLe
 }
 
 export async function editSupply(id: string, name: string, description: string, quantity: number, type: string, color: string): Promise<void> {
-  await executeQuery('UPDATE supplies SET ' +
+  /* eslint-disable */
+  const res = await executeQuery('UPDATE supplies SET ' +
     'name = \'' + name + '\', description = \'' + description + '\', quantity = \'' + quantity.toString() + '\', ' +
     'type = \'' + type + '\', color = \'' + color + '\' WHERE id = ' + id + ';');
+  if (res.changedRows === 0) throw(ERROR_SUPPLY_NOT_FOUND);
+  /* eslint-enable */
 }
 
 export async function querySupply(id: string): Promise<Supply> {
@@ -25,6 +29,8 @@ export async function querySupply(id: string): Promise<Supply> {
 }
 
 export async function deleteSupply(id: string): Promise<any> {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return await executeQuery('DELETE FROM supplies WHERE id = ' + id + ';');
+  /* eslint-disable */
+  const res = await executeQuery('DELETE FROM supplies WHERE id = ' + id + ';');
+  if (res.affectedRows === 0) throw(ERROR_SUPPLY_NOT_FOUND);
+  /* eslint-enable */
 }

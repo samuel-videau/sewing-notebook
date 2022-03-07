@@ -2,7 +2,7 @@ import { FastifyInstance } from 'fastify'
 import {Supply} from "../schemas/types/supply";
 import * as supplySchema from '../schemas/json/supply.json';
 import {logError} from "../bin/logger";
-import {error, ERROR_INTERNAL} from "../bin/utils/error-messages";
+import {error, ERROR_INTERNAL, ERROR_SUPPLY_NOT_FOUND} from "../bin/utils/error-messages";
 import {deleteSupply, editSupply, insertSupply, queryAllSupplies, querySupply} from "../bin/DB/supplies.table";
 
 const suppliesParamsSchema = {
@@ -71,6 +71,7 @@ export async function suppliesController (fastify: FastifyInstance) {
       try {
         const { supplyId } = request.params as { supplyId: string };
         const supply = await querySupply(supplyId);
+        if (!supply) return reply.code(404).send(error(404, ERROR_SUPPLY_NOT_FOUND));
         return reply.code(200).send(supply);
       } catch (e: any) {
         logError(e);
@@ -95,7 +96,9 @@ export async function suppliesController (fastify: FastifyInstance) {
         await editSupply(supplyId, request.body.name, request.body.description, request.body.quantity, request.body.type, request.body.color)
         await reply.code(200).send();
       } catch (e: any) {
-        return reply.code(500).send('Internal Error');
+        logError(e);
+        if (e === ERROR_SUPPLY_NOT_FOUND) return reply.code(404).send(error(404, ERROR_SUPPLY_NOT_FOUND));
+        return reply.code(500).send(error(500, ERROR_INTERNAL));
       }
     }
   });
@@ -115,6 +118,8 @@ export async function suppliesController (fastify: FastifyInstance) {
         await deleteSupply(supplyId);
         await reply.code(200).send();
       } catch (e: any) {
+        logError(e);
+        if (e === ERROR_SUPPLY_NOT_FOUND) return reply.code(404).send(error(404, ERROR_SUPPLY_NOT_FOUND));
         return reply.code(500).send('Internal Error');
       }
     }

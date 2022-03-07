@@ -4,7 +4,13 @@ import * as todoItemSchema from "../schemas/json/todo-item.json";
 import {completeTodo, deleteTodo, editTodo, insertTodo, queryAllTodosOfProject, queryTodo} from "../bin/DB/todos.table";
 import {commitTransaction, rollbackTransaction, startTransaction} from "../bin/DB/mysql";
 import {logError} from "../bin/logger";
-import {error, ERROR_INTERNAL} from "../bin/utils/error-messages";
+import {
+  error,
+  ERROR_INTERNAL,
+  ERROR_PROJECT_NOT_FOUND,
+  ERROR_SUPPLY_NOT_FOUND,
+  ERROR_TODO_NOT_FOUND
+} from "../bin/utils/error-messages";
 import {
   insertSupplyRequired,
   queryAllSuppliesRequiredOfTodo
@@ -12,6 +18,7 @@ import {
 import {SupplyRequired} from "../schemas/types/supplyRequired";
 import {editSupply, querySupply} from "../bin/DB/supplies.table";
 import {Supply} from "../schemas/types/supply";
+import {MysqlError} from "mysql";
 
 const projectParamsSchema = {
   type: 'object',
@@ -65,6 +72,8 @@ export async function todoItemsController (fastify: FastifyInstance) {
         catch (e) {
           await rollbackTransaction();
           logError(e);
+          if ((e as MysqlError).errno === 1452 && (e as MysqlError).sqlMessage?.includes('project')) return reply.code(404).send(error(404, ERROR_PROJECT_NOT_FOUND));
+          if ((e as MysqlError).errno === 1452 && (e as MysqlError).sqlMessage?.includes('supply')) return reply.code(404).send(error(404, ERROR_SUPPLY_NOT_FOUND));
           return reply.code(500).send(error(500, ERROR_INTERNAL));
         }
       }
@@ -113,6 +122,7 @@ export async function todoItemsController (fastify: FastifyInstance) {
           try {
             const { projectId, todoItemId } = request.params as { projectId: string, todoItemId: string };
             const todo: TodoItem = await queryTodo(todoItemId);
+            if (!todo) return reply.code(404).send(error(404, ERROR_TODO_NOT_FOUND));
             todo.suppliesRequired = await queryAllSuppliesRequiredOfTodo(todoItemId);
             return reply.code(200).send(todo);
           } catch (e) {
@@ -136,6 +146,7 @@ export async function todoItemsController (fastify: FastifyInstance) {
             await reply.code(200).send();
           } catch (e: any) {
             logError(e);
+            if (e === ERROR_TODO_NOT_FOUND) return reply.code(404).send(error(404, ERROR_TODO_NOT_FOUND));
             return reply.code(500).send(error(500, ERROR_INTERNAL));
           }
         }
@@ -153,6 +164,8 @@ export async function todoItemsController (fastify: FastifyInstance) {
             await deleteTodo(todoItemId);
             await reply.code(200).send();
           } catch (e: any) {
+            logError(e);
+            if (e === ERROR_TODO_NOT_FOUND) return reply.code(404).send(error(404, ERROR_TODO_NOT_FOUND));
             return reply.code(500).send(error(500, ERROR_INTERNAL));
           }
         }
@@ -192,6 +205,7 @@ export async function todoItemsController (fastify: FastifyInstance) {
         return reply.code(200).send();
       } catch (e: any) {
         logError(e);
+        if (e === ERROR_TODO_NOT_FOUND) return reply.code(404).send(error(404, ERROR_TODO_NOT_FOUND));
         return reply.code(500).send(error(500, ERROR_INTERNAL));
       }
     }
