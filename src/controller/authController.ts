@@ -10,7 +10,7 @@ import {JWT_VALIDITY_TIME} from "../environment/config";
 export async function authController (fastify: FastifyInstance) {
 
   fastify.route<{ Body: User }>({
-    method: 'GET',
+    method: 'PUT',
     url: '/',
     schema: {
       description: 'Get a JWT token with email and password login',

@@ -17,9 +17,10 @@ export function generateJWT(userId: string): string {
 	}, JWT_SECRET, {expiresIn: JWT_VALIDITY_TIME.toString() + 'h'});
 }
 
-export async function verifyJWT(req: FastifyRequest, res: FastifyReply, projectId: string) {
+export async function verifyJWT(req: FastifyRequest, res: FastifyReply, projectId?: string): Promise<string> {
 	if (!req.headers.authorization) return res.code(401).send(error(401, ERROR_NO_JWT_TOKEN));
 	const payload: JWTPayload = jwt.verify(req.headers.authorization?.split(' ')[1], JWT_SECRET) as JWTPayload;
-	if (!await queryProjectAuth(payload.userId, projectId)) return res.code(403).send(error(403, ERROR_UNAUTHORIZED));
+	if (projectId && !await queryProjectAuth(payload.userId, projectId)) return res.code(403).send(error(403, ERROR_UNAUTHORIZED));
 	if (payload.exp < parseInt((new Date()).getTime().toString().slice(0, 10))) return res.code(401).send(error(401, ERROR_JWT_EXPIRED));
+	return payload.userId;
 }

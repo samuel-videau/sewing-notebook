@@ -13,6 +13,8 @@ import {
   queryAllSuppliesRequiredOfTodo,
 } from "../bin/DB/suppliesRequired.table";
 import {MysqlError} from "mysql";
+import {insertProjectAuth} from "../bin/DB/project-auth.table";
+import {verifyJWT} from "../bin/json-web-token";
 
 const projectParamsSchema = {
     type: 'object',
@@ -35,6 +37,7 @@ export async function projectsController (fastify: FastifyInstance) {
       },
       handler: async (request, reply) => {
         try {
+          const userId: string = await verifyJWT(request, reply);
           const project: Project = request.body;
           await startTransaction();
           const projectId = await insertProject(project.name, project.description);
@@ -54,6 +57,8 @@ export async function projectsController (fastify: FastifyInstance) {
               project.todo[i] = todoItem;
             }
           }
+
+          await insertProjectAuth(userId, projectId);
 
           await commitTransaction();
           await reply.code(200).send({projectId, ...project});
@@ -103,6 +108,7 @@ export async function projectsController (fastify: FastifyInstance) {
     handler: async function (request, reply) {
       try {
         const {projectId} = request.params as { projectId: string };
+        await verifyJWT(request, reply, projectId);
         const project: Project = await queryProject(projectId);
         const todo: TodoItem[] = await queryAllTodosOfProject(projectId);
 
@@ -139,6 +145,7 @@ export async function projectsController (fastify: FastifyInstance) {
         handler: async function (request, reply) {
           try {
             const { projectId } = request.params as { projectId: string };
+            await verifyJWT(request, reply, projectId);
             await editProject(projectId, request.body.name, request.body.description);
             await reply.code(200).send();
           }  catch(e: any) {
@@ -161,6 +168,7 @@ export async function projectsController (fastify: FastifyInstance) {
         handler: async function (request, reply) {
           try {
             const { projectId } = request.params as { projectId: string };
+            await verifyJWT(request, reply, projectId);
             await deleteProject(projectId);
             await reply.code(200).send();
           } catch (e: any) {

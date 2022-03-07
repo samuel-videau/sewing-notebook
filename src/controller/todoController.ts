@@ -19,6 +19,7 @@ import {SupplyRequired} from "../schemas/types/supplyRequired";
 import {editSupply, querySupply} from "../bin/DB/supplies.table";
 import {Supply} from "../schemas/types/supply";
 import {MysqlError} from "mysql";
+import {verifyJWT} from "../bin/json-web-token";
 
 const projectParamsSchema = {
   type: 'object',
@@ -54,6 +55,7 @@ export async function todoItemsController (fastify: FastifyInstance) {
         try {
           const todo: TodoItem = request.body;
           const { projectId } = request.params as { projectId: string };
+          await verifyJWT(request, reply, projectId);
 
           await startTransaction();
           todo.id = await insertTodo(projectId, todo.name, todo.description, todo.completed);
@@ -96,6 +98,8 @@ export async function todoItemsController (fastify: FastifyInstance) {
         handler: async function (request, reply) {
           try {
             const { projectId } = request.params as { projectId: string };
+            await verifyJWT(request, reply, projectId);
+
             const todo: TodoItem[] = await queryAllTodosOfProject(projectId);
             for (let i = 0; i < todo.length; i++) {
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -120,8 +124,9 @@ export async function todoItemsController (fastify: FastifyInstance) {
           },
         handler: async function (request, reply) {
           try {
-            const { projectId, todoItemId } = request.params as { projectId: string, todoItemId: string };
+            const { todoItemId } = request.params as { todoItemId: string };
             const todo: TodoItem = await queryTodo(todoItemId);
+            await verifyJWT(request, reply, todo.projectId);
             if (!todo) return reply.code(404).send(error(404, ERROR_TODO_NOT_FOUND));
             todo.suppliesRequired = await queryAllSuppliesRequiredOfTodo(todoItemId);
             return reply.code(200).send(todo);
@@ -141,7 +146,9 @@ export async function todoItemsController (fastify: FastifyInstance) {
           },
         handler: async function (request, reply) {
           try {
-            const { projectId, todoItemId } = request.params as { projectId: string, todoItemId: string };
+            const { todoItemId } = request.params as { todoItemId: string };
+            const todo: TodoItem = await queryTodo(todoItemId);
+            await verifyJWT(request, reply, todo.projectId);
             await editTodo(todoItemId, request.body.name, request.body.description)
             await reply.code(200).send();
           } catch (e: any) {
@@ -160,7 +167,9 @@ export async function todoItemsController (fastify: FastifyInstance) {
         },
         handler: async function (request, reply) {
           try {
-            const { projectId, todoItemId } = request.params as { projectId: string, todoItemId: string };
+            const { todoItemId } = request.params as { todoItemId: string };
+            const todo: TodoItem = await queryTodo(todoItemId);
+            await verifyJWT(request, reply, todo.projectId);
             await deleteTodo(todoItemId);
             await reply.code(200).send();
           } catch (e: any) {
@@ -180,7 +189,10 @@ export async function todoItemsController (fastify: FastifyInstance) {
     },
     handler: async function (request, reply) {
       try {
-        const { projectId, todoItemId } = request.params as { projectId: string, todoItemId: string };
+        const { todoItemId } = request.params as { todoItemId: string };
+
+        const todo: TodoItem = await queryTodo(todoItemId);
+        await verifyJWT(request, reply, todo.projectId);
 
         await startTransaction();
         const suppliesRequired: SupplyRequired[] = await queryAllSuppliesRequiredOfTodo(todoItemId);
