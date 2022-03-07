@@ -1,0 +1,12 @@
+{
+  "$id": "user.json",
+  "$schema": "http://json-schema.org/schema",
+  "type": "object",
+  "required": ["email", "password"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {"id":  "string", "description":  "Id of the user"},
+    "email": {"type":  "string", "description":"Email of the user", "pattern":  "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"},
+    "password": { "type": "string", "description": "Password of the user" }
+  }
+}
