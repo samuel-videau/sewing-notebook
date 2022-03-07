@@ -2,6 +2,28 @@ CREATE DATABASE sewing;
 
 use sewing;
 
+CREATE TABLE `users` (
+  `id` INT NOT NULL,
+  `email` VARCHAR(45) NOT NULL,
+  `password` VARCHAR(45) NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE,
+  UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE);
+
+CREATE TABLE `project_auth` (
+  `projectId` INT NOT NULL,
+  `userId` INT NOT NULL,
+  CONSTRAINT `projectid_fk`
+    FOREIGN KEY (`projectId`)
+    REFERENCES `sewing`.`projects` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT `userid_fk`
+    FOREIGN KEY (`userId`)
+    REFERENCES `sewing`.`users` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION);
+
 CREATE TABLE `projects` (
   `id` int NOT NULL,
   `name` varchar(45) DEFAULT NULL,
