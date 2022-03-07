@@ -11,6 +11,7 @@ export const DB_HOST: string = getOrThrow('DB_HOST');
 export const DB_NAME: string = getOrThrow('DB_NAME');
 export const DB_USER: string = getOrThrow('DB_USER');
 export const DB_PASSWORD: string = getOrThrow('DB_PASSWORD');
+export const JWT_SECRET: string = getOrThrow('JWT_SECRET');
 
 function getOrThrow(name: string) {
   const val = process.env[name];
