@@ -16,9 +16,9 @@ export async function insertUser(email: string, password: string): Promise<strin
 
 export async function queryUser(email: string, password: string): Promise<string> {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  const id: string | undefined = ((await executeQuery('SELECT * FROM users WHERE email = \'' + email + '\' && password = \'' + password + '\';'))[0] as User).id;
-  if (id) return id;
-  else throw (ERROR_USER_NOT_FOUND);
+  const user: User = (await executeQuery('SELECT * FROM users WHERE email = \'' + email + '\' && password = \'' + password + '\';'))[0] as User;
+  if (!user) throw (ERROR_USER_NOT_FOUND);
+  else return user.id ? user.id : '';
 }
 
 export async function deleteUser(id: string): Promise<void> {
