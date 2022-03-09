@@ -1,3 +1,5 @@
+Team members : Yves ALLARY, May-Line GADONNA, Samuel VIDEAU
+
 # sewing-notebook
 
 ## Abstract
