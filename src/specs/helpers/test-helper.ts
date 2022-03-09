@@ -11,14 +11,9 @@ const clearDBQueries = ['use sewing_test;',
 ];
 
 export async function clearDB(): Promise<void> {
-  return new Promise((resolve) => {
-    clearDBQueries.forEach(query => {
-      void (async () => {
-        await executeQuery(query);
-      })();
-    });
-    resolve();
-  });
+  for (const query of clearDBQueries) {
+    await executeQuery(query);
+  }
 }
 
 before(async () => {

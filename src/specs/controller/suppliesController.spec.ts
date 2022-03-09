@@ -1,8 +1,13 @@
 import {expect} from "chai";
 import { fastify } from "../../lib/fastify";
 import {Supply} from "../../schemas/types/supply";
+import {clearDB} from "../helpers/test-helper";
 
 describe('supplies routes', () => {
+
+  beforeEach(async () => {
+    await clearDB();
+  })
 
   describe('POST /supplies/', () => {
 
@@ -44,9 +49,10 @@ describe('supplies routes', () => {
 
   describe('GET /supplies/', () => {
     const suppliesToCreate = 5;
-    const supplies: Supply[] = [];
+    let supplies: Supply[] = [];
 
-    before(async () => {
+    beforeEach(async () => {
+      supplies = [];
 
       for (let i = 0; i < suppliesToCreate; i++) {
         const res: Supply = JSON.parse((await fastify.inject({method: 'POST', url: 'supplies', payload : {
@@ -73,6 +79,9 @@ describe('supplies routes', () => {
 
       supplies.sort((a, b) => parseInt(a.id ? a.id: '0') - parseInt(b.id ? b.id: '0'));
 
+      console.log(resSupplies.length)
+      console.log(supplies.length)
+
       for (let i = 0; i < resSupplies.length; i++) {
         expect(resSupplies[i].id).to.equal(supplies[i].id);
         expect(resSupplies[i].description).to.equal(supplies[i].description);
@@ -87,7 +96,7 @@ describe('supplies routes', () => {
   describe('GET /supplies/:supplyId', () => {
     let supply: Supply;
 
-    before(async () => {
+    beforeEach(async () => {
       supply = JSON.parse((await fastify.inject({method: 'POST', url: 'supplies', payload : {
           name: "Test",
           description: "Test",
@@ -130,7 +139,7 @@ describe('supplies routes', () => {
   describe('PUT /supplies/:supplyId', () => {
     let supply: Supply;
 
-    before(async () => {
+    beforeEach(async () => {
       supply = JSON.parse((await fastify.inject({method: 'POST', url: 'supplies', payload : {
           name: "Test",
           description: "Test",
@@ -219,7 +228,7 @@ describe('supplies routes', () => {
   describe('DELETE /supplies/:supplyId', () => {
     let supply: Supply;
 
-    before(async () => {
+    beforeEach(async () => {
       supply = JSON.parse((await fastify.inject({method: 'POST', url: 'supplies', payload : {
           name: "Test",
           description: "Test",
