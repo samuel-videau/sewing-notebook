@@ -31,7 +31,7 @@ export async function suppliesController (fastify: FastifyInstance) {
         supply.id = await insertSupply(supply.name, supply.description, supply.quantity, supply.type, supply.color);
         return reply.code(200).send(supply);
       } catch (e) {
-        logError(e)
+        logError(e);
         return reply.code(500).send(error(500, ERROR_INTERNAL));
       }
     }
