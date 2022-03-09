@@ -11,7 +11,7 @@ export async function queryProjectAuth(userId: string, projectId: string): Promi
   return (await executeQuery('SELECT * FROM users WHERE userId = ' + userId + ' && projectId = ' + projectId + ';'))[0] as ProjectAuth;
 }
 
-export async function deleteUser(userId: string, projectId: string): Promise<void> {
+export async function deleteProjectAuth(userId: string, projectId: string): Promise<void> {
   /* eslint-disable */
   const res = await executeQuery('DELETE FROM project_auth WHERE userId = ' + userId + ' && projectId = ' + projectId + ';');
   if (res.affectedRows === 0) throw(ERROR_UNAUTHORIZED);

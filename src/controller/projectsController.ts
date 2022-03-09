@@ -20,7 +20,7 @@ import {
   queryAllSuppliesRequiredOfTodo,
 } from "../bin/DB/suppliesRequired.table";
 import {MysqlError} from "mysql";
-import {insertProjectAuth} from "../bin/DB/project-auth.table";
+import {deleteProjectAuth, insertProjectAuth} from "../bin/DB/project-auth.table";
 import {verifyJWT} from "../bin/json-web-token";
 
 const projectParamsSchema = {
@@ -29,6 +29,15 @@ const projectParamsSchema = {
     properties: {
         projectId: { type: 'string', description: 'Id of the project' }
     }
+}
+
+const projectUserParamsSchema = {
+  type: 'object',
+  required: ['projectId', 'userId'],
+  properties: {
+    projectId: { type: 'string', description: 'Id of the project' },
+    userId: { type: 'string', description: 'Id of the user' }
+  }
 }
 
 export async function projectsController (fastify: FastifyInstance) {
@@ -211,4 +220,29 @@ export async function projectsController (fastify: FastifyInstance) {
       }
     }
   });
-  }
+
+  fastify.route<{ Body: { userId: string } }>({
+    method: 'DELETE',
+    url: '/:projectId/permissions/:userId',
+    schema: {
+      description: 'Revoke the permissions to a user to access this project',
+      tags: ['project'],
+      summary: 'Revoke permissions to a user',
+      params: projectUserParamsSchema,
+    },
+    handler: async function (request, reply) {
+      try {
+        const { projectId } = request.params as { projectId: string };
+        const { userId } = request.body;
+        await verifyJWT(request, reply, projectId);
+        await deleteProjectAuth(userId, projectId);
+        await reply.code(200).send({message: 'The permissions were successfully revoked'});
+      } catch (e: any) {
+        logError(e);
+        if ((e as MysqlError).errno === 1452 && (e as MysqlError).sqlMessage?.includes('user')) return reply.code(404).send(error(404, ERROR_USER_NOT_FOUND));
+        if (e === ERROR_PROJECT_NOT_FOUND) return reply.code(404).send(error(404, ERROR_PROJECT_NOT_FOUND));
+        return reply.code(500).send('Internal Error');
+      }
+    }
+  });
+}
