@@ -2,7 +2,7 @@
   "$id": "update-project.json",
   "$schema": "http://json-schema.org/schema",
   "type": "object",
-  "required": [],
+  "required": ["name", "description"],
   "additionalProperties": false,
   "properties": {
     "name": { "type": "string", "description": "Name of the project" },

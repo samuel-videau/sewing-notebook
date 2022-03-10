@@ -5,8 +5,8 @@
   "required": ["userId"],
   "additionalProperties": false,
   "properties": {
-    "name": {
-      "userId": "string"
+    "userId": {
+      "type": "string"
     }
   }
 }
