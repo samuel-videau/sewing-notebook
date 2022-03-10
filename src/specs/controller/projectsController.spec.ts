@@ -1,51 +1,135 @@
-import {Response} from "light-my-request";
-import {fastify} from "../../lib/fastify";
-import {projectCorrectBody} from "../helpers/body-helper";
 import {expect} from "chai";
-import * as admin from 'firebase-admin';
+import { fastify } from "../../lib/fastify";
+import {projectCorrectBody} from "../helpers/body-helper";
+import {clearDB} from "../helpers/test-helper";
+import {generateJWT} from "../../bin/json-web-token";
 import {Project} from "../../schemas/types/project";
-import {TodoItem} from "../../schemas/types/todo-item";
 
-describe('POST /projects', () => {
+describe('projects routes', () => {
 
-  let postRes: Response;
+  let JWT = '';
+  const unknownUserJWT = generateJWT('783462');
+  const EXPIRED_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1NzkyODQzMTgiLCJpYXQiOjE2NDY2Nzc4NzIsImV4cCI6MTY0NjY5OTQ3Mn0.XW4EFMxo1lkl6M3x8J6tFb9SlP_sq1M7Wrh_hqP3mAg';
 
-  before(async () => {
-    postRes = await fastify.inject({method: 'POST', url: '/projects', payload: projectCorrectBody});
-  });
+  const supplyPayload = {
+    name: "Test",
+    description: "Test",
+    type: "Test",
+    color: "Test",
+    quantity: 20
+  };
 
-  it('should accept correctly formed body', async () => {
-    expect(postRes.statusCode).to.equal(200);
-  });
+  beforeEach(async () => {
+    await clearDB();
+    const res = await fastify.inject({method: 'POST', url: '/users/', payload : {
+        email: 'samuelvideau@yahoo.fr',
+        password: 'password'
+      }});
+    const resBody: {jwt: {token: string}, userId: string} = JSON.parse(res.body) as {jwt: {token: string}, userId: string};
+    JWT = resBody.jwt.token;
+  })
 
-  it('should return correct value', () => {
-    expect(postRes.body.length).to.be.above(0);
-  });
+  describe('POST /projects/', () => {
 
-  it('should have created an item in the project collection', async () => {
-    const doc = await admin.firestore().collection('project').doc(postRes.body).get();
-    const project: Project = doc.data() as Project;
-    expect(project.name).to.equal(projectCorrectBody.name);
-    expect(project.description).to.equal(projectCorrectBody.description);
-  });
+    it('should return 400 if missing property in body', async () => {
+      const res = await fastify.inject({method: 'POST', url: '/projects/', payload : {
+          name: 'Project name'
+        }});
 
-  describe('todo list creation',  () => {
-
-    const todo: TodoItem[] = [];
-
-    before(async () => {
-      const data = await admin.firestore().collection('project').doc(postRes.body).collection('todo').get();
-      data.docs.map(doc => todo.push(doc.data() as TodoItem));
+      expect(res.statusCode).to.equal(400);
     });
 
-    it('should have created the right amount of todo items',  () => {
-      expect(todo.length).to.equal(projectCorrectBody?.todo?.length);
+    it('should return 404 if unknown supplies', async () => {
+      const res = await fastify.inject({method: 'POST', url: '/projects/', payload : projectCorrectBody('3721734', '237462342'), headers: {
+        authorization: 'Bearer ' + JWT
+        }});
+
+      expect(res.statusCode).to.equal(404);
     });
 
-    it('should have properly formatted todo items',  () => {
-      todo.forEach(todoItem => {
-        expect(projectCorrectBody?.todo?.includes(todoItem)).to.equal(false);
-      });
+    it('should return 401 if no JWT', async () => {
+      const res = await fastify.inject({method: 'POST', url: '/projects/', payload : projectCorrectBody('3721734', '237462342')});
+
+      expect(res.statusCode).to.equal(401);
+    });
+
+    it('should return 401 if expired JWT', async () => {
+      const res = await fastify.inject({method: 'POST', url: '/projects/', payload : projectCorrectBody('3721734', '237462342'), headers: {
+        authorization: 'Bearer ' + EXPIRED_JWT
+        }});
+
+      expect(res.statusCode).to.equal(401);
+    });
+
+    it('should return 200 if correct body', async () => {
+      const supplyId1: string = (JSON.parse((await fastify.inject({method: 'POST', url: 'supplies', payload : supplyPayload})).body) as {id: string}).id;
+      const supplyId2: string = (JSON.parse((await fastify.inject({method: 'POST', url: 'supplies', payload : supplyPayload})).body) as {id: string}).id;
+      const res = await fastify.inject({method: 'POST', url: '/projects/', payload : projectCorrectBody(supplyId1, supplyId2), headers: {
+          authorization: 'Bearer ' + JWT
+        }});
+      expect(res.statusCode).to.equal(200);
+    });
+  });
+
+  describe('GET /project/:projectId/', () => {
+
+    let project: Project;
+
+    beforeEach(async () => {
+      const supplyId1: string = (JSON.parse((await fastify.inject({method: 'POST', url: '/supplies/', payload : supplyPayload})).body) as {id: string}).id;
+      const supplyId2: string = (JSON.parse((await fastify.inject({method: 'POST', url: '/supplies/', payload : supplyPayload})).body) as {id: string}).id;
+      project = JSON.parse((await fastify.inject({method: 'POST', url: '/projects/', payload : projectCorrectBody(supplyId1, supplyId2), headers: {
+          authorization: 'Bearer ' + JWT
+        }})).body) as Project;
     })
+
+    it('should return 401 if no JWT', async () => {
+      if (project.id) {
+        const res = await fastify.inject({method: 'GET', url: '/projects/' + project.id});
+
+        expect(res.statusCode).to.equal(401);
+      } else throw Error('No id');
+    });
+
+    it('should return 401 if expired JWT', async () => {
+      if (project.id) {
+        const res = await fastify.inject({method: 'GET', url: '/projects/' + project.id, headers: {
+          authorization: 'Bearer ' + EXPIRED_JWT
+          }});
+
+        expect(res.statusCode).to.equal(401);
+      } else throw Error('No id');
+    });
+
+    it('should return 403 if JWT of another user', async () => {
+      if (project.id) {
+        const res = await fastify.inject({method: 'GET', url: '/projects/' + project.id, headers: {
+            authorization: 'Bearer ' + unknownUserJWT
+          }});
+
+        expect(res.statusCode).to.equal(403);
+      } else throw Error('No id');
+    });
+
+    it('should return 403 if unknown project id', async () => {
+      if (project.id) {
+        const res = await fastify.inject({method: 'GET', url: '/projects/' + project.id + '0', headers: {
+            authorization: 'Bearer ' + JWT
+          }});
+
+        expect(res.statusCode).to.equal(403);
+      } else throw Error('No id');
+    });
+
+    it('should return 200 if correct info', async () => {
+      if (project.id) {
+        const res = await fastify.inject({method: 'GET', url: '/projects/' + project.id, headers: {
+            authorization: 'Bearer ' + JWT
+          }});
+
+        expect(res.statusCode).to.equal(200);
+      } else throw Error('No id');
+    });
   });
+
 });

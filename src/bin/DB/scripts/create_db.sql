@@ -10,26 +10,26 @@ CREATE TABLE `users` (
   UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE,
   UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE);
 
+  CREATE TABLE `projects` (
+    `id` int NOT NULL,
+    `name` varchar(45) DEFAULT NULL,
+    `description` varchar(135) DEFAULT NULL,
+    PRIMARY KEY (`id`)
+  );
+
 CREATE TABLE `project_auth` (
   `projectId` INT NOT NULL,
   `userId` INT NOT NULL,
   CONSTRAINT `projectid_fk`
     FOREIGN KEY (`projectId`)
-    REFERENCES `sewing`.`projects` (`id`)
+    REFERENCES `projects` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION,
   CONSTRAINT `userid_fk`
     FOREIGN KEY (`userId`)
-    REFERENCES `sewing`.`users` (`id`)
+    REFERENCES `users` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION);
-
-CREATE TABLE `projects` (
-  `id` int NOT NULL,
-  `name` varchar(45) DEFAULT NULL,
-  `description` varchar(135) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-);
 
 CREATE TABLE `supplies` (
   `id` INT NOT NULL,

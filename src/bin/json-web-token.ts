@@ -4,6 +4,7 @@ import {FastifyReply, FastifyRequest} from 'fastify';
 import {error, ERROR_JWT_EXPIRED, ERROR_NO_JWT_TOKEN, ERROR_UNAUTHORIZED} from './utils/error-messages';
 import {JWT_VALIDITY_TIME} from "../environment/config";
 import {queryProjectAuth} from "./DB/project-auth.table";
+import {logError} from "./logger";
 
 export interface JWTPayload {
   userId: string,
@@ -18,9 +19,23 @@ export function generateJWT(userId: string): string {
 }
 
 export async function verifyJWT(req: FastifyRequest, res: FastifyReply, projectId?: string): Promise<string> {
+	let payload: JWTPayload;
 	if (!req.headers.authorization) return res.code(401).send(error(401, ERROR_NO_JWT_TOKEN));
-	const payload: JWTPayload = jwt.verify(req.headers.authorization?.split(' ')[1], JWT_SECRET) as JWTPayload;
-	if (projectId && !await queryProjectAuth(payload.userId, projectId)) return res.code(403).send(error(403, ERROR_UNAUTHORIZED));
-	if (payload.exp < parseInt((new Date()).getTime().toString().slice(0, 10))) return res.code(401).send(error(401, ERROR_JWT_EXPIRED));
+	try {
+		payload = jwt.verify(req.headers.authorization?.split(' ')[1], JWT_SECRET) as JWTPayload;
+	} catch (e) {
+		logError(e);
+		return res.code(401).send(error(401, ERROR_JWT_EXPIRED));
+	}
+	if (projectId) {
+		try  {
+			const projectAuth = await queryProjectAuth(payload.userId, projectId);
+			if (!projectAuth) {
+				return res.code(403).send(error(403, ERROR_UNAUTHORIZED));
+			}
+		} catch (e) {
+			return res.code(403).send(error(403, ERROR_UNAUTHORIZED));
+		}
+	}
 	return payload.userId;
 }

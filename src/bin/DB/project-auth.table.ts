@@ -7,8 +7,9 @@ export async function insertProjectAuth(userId: string, projectId: string): Prom
 }
 
 export async function queryProjectAuth(userId: string, projectId: string): Promise<ProjectAuth> {
+  const query = 'SELECT * FROM project_auth WHERE userId = ' + userId + ' && projectId = ' + projectId + ';';
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  return (await executeQuery('SELECT * FROM users WHERE userId = ' + userId + ' && projectId = ' + projectId + ';'))[0] as ProjectAuth;
+  return (await executeQuery(query))[0] as ProjectAuth;
 }
 
 export async function deleteProjectAuth(userId: string, projectId: string): Promise<void> {

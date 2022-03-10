@@ -79,9 +79,6 @@ describe('supplies routes', () => {
 
       supplies.sort((a, b) => parseInt(a.id ? a.id: '0') - parseInt(b.id ? b.id: '0'));
 
-      console.log(resSupplies.length)
-      console.log(supplies.length)
-
       for (let i = 0; i < resSupplies.length; i++) {
         expect(resSupplies[i].id).to.equal(supplies[i].id);
         expect(resSupplies[i].description).to.equal(supplies[i].description);
