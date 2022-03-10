@@ -15,7 +15,7 @@ export async function clearDB(): Promise<void> {
     await executeQuery(query);
   }
 }
-
-before(async () => {
-  await clearDB();
-})
+//
+// before(async () => {
+//   await clearDB();
+// })

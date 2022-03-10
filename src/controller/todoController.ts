@@ -126,8 +126,8 @@ export async function todoItemsController (fastify: FastifyInstance) {
           try {
             const { todoItemId } = request.params as { todoItemId: string };
             const todo: TodoItem = await queryTodo(todoItemId);
-            await verifyJWT(request, reply, todo.projectId);
             if (!todo) return reply.code(404).send(error(404, ERROR_TODO_NOT_FOUND));
+            await verifyJWT(request, reply, todo.projectId);
             todo.suppliesRequired = await queryAllSuppliesRequiredOfTodo(todoItemId);
             return reply.code(200).send(todo);
           } catch (e) {
@@ -169,12 +169,12 @@ export async function todoItemsController (fastify: FastifyInstance) {
           try {
             const { todoItemId } = request.params as { todoItemId: string };
             const todo: TodoItem = await queryTodo(todoItemId);
+            if (!todo) return reply.code(404).send(error(404, ERROR_TODO_NOT_FOUND));
             await verifyJWT(request, reply, todo.projectId);
             await deleteTodo(todoItemId);
             await reply.code(200).send();
           } catch (e: any) {
             logError(e);
-            if (e === ERROR_TODO_NOT_FOUND) return reply.code(404).send(error(404, ERROR_TODO_NOT_FOUND));
             return reply.code(500).send(error(500, ERROR_INTERNAL));
           }
         }
