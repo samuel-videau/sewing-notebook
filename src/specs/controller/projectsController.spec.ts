@@ -5,7 +5,7 @@ import {clearDB} from "../helpers/test-helper";
 import {generateJWT} from "../../bin/json-web-token";
 import {Project} from "../../schemas/types/project";
 
-describe('projects routes', () => {
+export const projectsControllerSpec = () => describe('projects routes', () => {
 
   let JWT = '';
   let USERID = '';

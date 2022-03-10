@@ -3,7 +3,7 @@ import { fastify } from "../../lib/fastify";
 import {Supply} from "../../schemas/types/supply";
 import {clearDB} from "../helpers/test-helper";
 
-describe('supplies routes', () => {
+export const suppliesControllerSpec = () => describe('supplies routes', () => {
 
   beforeEach(async () => {
     await clearDB();

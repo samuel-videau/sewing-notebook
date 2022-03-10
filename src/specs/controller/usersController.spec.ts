@@ -5,7 +5,7 @@ import {JWTPayload} from "../../bin/json-web-token";
 import {JWT_SECRET} from "../../environment/endpoints";
 import {clearDB} from "../helpers/test-helper";
 
-describe('users routes', () => {
+export const usersControllerSpec = () => describe('users routes', () => {
 
   describe('POST /users/', () => {
 

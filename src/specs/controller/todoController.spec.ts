@@ -6,7 +6,7 @@ import {generateJWT} from "../../bin/json-web-token";
 import {Project} from "../../schemas/types/project";
 import {describe} from "mocha";
 
-describe('todos routes', () => {
+export const todoControllerSpec = () => describe('todos routes', () => {
 
   let [JWT, projectId, supplyId1, supplyId2] = ['', '', '', ''];
   let project: Project;

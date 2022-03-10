@@ -5,7 +5,7 @@ import {JWTPayload} from "../../bin/json-web-token";
 import {JWT_SECRET} from "../../environment/endpoints";
 import {clearDB} from "../helpers/test-helper";
 
-describe('auth routes', () => {
+export const authControllerSpec = () => describe('auth routes', () => {
 
   describe('PUT /auth/', () => {
 
