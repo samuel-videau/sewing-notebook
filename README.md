@@ -173,8 +173,8 @@ In your explanation, please provide links (file + line) to relevant parts of you
 - [x] You implemented automated specs. **[1 point]** 🔵
 > Please provide a link to the more complete summary you have.
 
-- [ ] Your test code coverage is 75% or more.  **[1 point]** 🔵
-> Please provide a link to the `istanbul` HTML coverage summary (or from a similar tool).
+- [x] Your test code coverage is 75% or more.  **[1 point]** 🔵
+> Report can be visualized here: ``/sewing-notebook/coverage/lcov-report/index.html``
 
 - [ ] Do you run the test on a CD/CI, such as Github Action? **[1 point]**
 > Please provide a link to the latest test summary you have, hosted on Github Action or similar.

@@ -1,0 +1,9 @@
+*.spec.ts
+*.html
+*.scss
+*.css
+*.svg
+*.jpg
+*.png
+*.sql
+/coverage/**/*
