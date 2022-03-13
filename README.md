@@ -76,7 +76,7 @@ In your explanation, please provide links (file + line) to relevant parts of you
 > We used accounts with email/password, providing a JWT token on login. The JWT token needs to be provided in the header as authorization
 
 - [x] Check the current user is allowed to perform the action on a specific resource. **[1 point]** 🔵
-> We had a `project_auth` table in our database that aimed to store the users permissions (eg. user A have the permission to access project A). 
+> We had a `project_auth` table in our database that aimed to store the users' permissions (eg. user A has the permission to access project A). 
 > Several users could have permissions on one project. 
 > So each JWT token contained the user Id, so we just had to query this table to verify if he had or not the permission to perform an action on the resource.
 
@@ -158,7 +158,6 @@ In your explanation, please provide links (file + line) to relevant parts of you
 
 - [x] No unhandled promise rejections, no uncaught exceptions… **[1 point]** 🔵
 > We used a try catch over all our routes, and we're using eslint to verify our code
-> Tips: one part of the answer could be the use of a linter.
 
 ### Code quality
 
