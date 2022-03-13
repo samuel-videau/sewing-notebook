@@ -2,12 +2,14 @@
   "$id": "project.json",
   "$schema": "http://json-schema.org/schema",
   "type": "object",
-  "required": ["name", "todo"],
+  "required": ["name", "description"],
   "additionalProperties": false,
   "properties": {
-    "name": { "type": "string" },
-    "description": { "type": "string" },
+    "id": {"type":  "string", "description":"Id of the project"},
+    "name": { "type": "string", "description": "Name of the project (required)" },
+    "description": { "type": "string", "description": "Description of the project" },
     "todo": {
+      "description": "List of to-do items",
       "type": "array",
       "items": {
         "$ref": "todo-item.json"

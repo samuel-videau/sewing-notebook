@@ -1,0 +1,12 @@
+{
+  "$id": "user-id.json",
+  "$schema": "http://json-schema.org/schema",
+  "type": "object",
+  "required": ["userId"],
+  "additionalProperties": false,
+  "properties": {
+    "userId": {
+      "type": "string"
+    }
+  }
+}

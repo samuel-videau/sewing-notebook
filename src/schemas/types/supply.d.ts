@@ -1,7 +1,8 @@
 export interface Supply {
+  id?: string
   name: string
-  description?: string
+  description: string
   type: string
   color: string
-  quantityLeft: number
+  quantity: number
 }

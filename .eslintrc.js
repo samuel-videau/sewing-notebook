@@ -21,7 +21,7 @@ module.exports = {
     // Still, I sometime use it for ugly legacy code or well scoped area.
     // PS: a better alternative would be the `unknown` type and turn the rule on again.
     '@typescript-eslint/no-explicit-any': 'off',
-
+    '@typescript-eslint/no-unsafe-call': 'off'
     // Feel free to enable/disable some rules depending on your needs.
   }
 }

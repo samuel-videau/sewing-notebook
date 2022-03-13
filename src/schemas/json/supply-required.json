@@ -1,0 +1,12 @@
+{
+  "$id": "supply-required.json",
+  "$schema": "http://json-schema.org/schema",
+  "type": "object",
+  "required": ["supplyId", "quantity"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string" },
+    "supplyId": { "type": "string" },
+    "quantity": { "type": "integer", "minimum": 0 }
+  }
+}

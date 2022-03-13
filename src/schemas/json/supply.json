@@ -2,13 +2,14 @@
   "$id": "supply.json",
   "$schema": "http://json-schema.org/schema",
   "type": "object",
-  "required": ["name", "type", "color", "quantityLeft"],
+  "required": ["name", "type", "color", "quantity", "description"],
   "additionalProperties": false,
   "properties": {
-    "name": { "type": "string" },
-    "description": { "type": "string" },
-    "type": { "type": "string" },
-    "color": { "type": "string" },
-    "quantityLeft": { "type": "integer", "minimum": 0 }
+    "id": {"type":  "string", "description":"Id of the item"},
+    "name": { "type": "string", "description": "Name of the item (required)" },
+    "description": { "type": "string", "description": "Description of the item" },
+    "type": { "type": "string", "description": "Type of the item (required)" },
+    "color": { "type": "string", "description": "Color of the item (required)" },
+    "quantity": { "type": "integer", "minimum": 0, "description": "Remaining quantity of the item (required)" }
   }
 }

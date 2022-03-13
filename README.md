@@ -61,115 +61,120 @@ In your explanation, please provide links (file + line) to relevant parts of you
 
 ### Input validation
 
-- [ ] Strictly and deeply validate the type of every input (`params, querystring, body`) at runtime before any processing. **[1 point]** 🔵
-> How did you achieve this?
+- [x] Strictly and deeply validate the type of every input (`params, querystring, body`) at runtime before any processing. **[1 point]** 🔵
+> We used json schemas to validate the input through fastify, in addition to other manual inputs validation
 
-- [ ] Ensure the type of every input can be inferred by Typescript at any time and properly propagates across the app. **[1 point]** 🔵
-> How did you achieve this?
+- [x] Ensure the type of every input can be inferred by Typescript at any time and properly propagates across the app. **[1 point]** 🔵
+> We used fastify automatic body conversion to our typescript interfaces
 
-- [ ] Ensure the static and runtime input types are always synced. **[1 point]** 🔵
+- [x] Ensure the static and runtime input types are always synced. **[1 point]** 🔵
 > How did you achieve this? If extra commands must be run before the typescript checking, how do you ensure there are run?
 
 ### Authorisation
 
-- [ ] Check the current user is allowed to call this endpoint. **[1 point]** 🔵
-> How did you achieve this?
+- [x] Check the current user is allowed to call this endpoint. **[1 point]** 🔵
+> We used accounts with email/password, providing a JWT token on login. The JWT token needs to be provided in the header as authorization
 
-- [ ] Check the current user is allowed to perform the action on a specific resource. **[1 point]** 🔵
-> How did you achieve this?
+- [x] Check the current user is allowed to perform the action on a specific resource. **[1 point]** 🔵
+> We had a `project_auth` table in our database that aimed to store the users' permissions (eg. user A has the permission to access project A). 
+> Several users could have permissions on one project. 
+> So each JWT token contained the user Id, so we just had to query this table to verify if he had or not the permission to perform an action on the resource.
 
-- [ ] Did you build or use an authorisation framework, making the authorisation widely used in your code base? **[1 point]**
-> How did you achieve this?
+- [x] Did you build or use an authorisation framework, making the authorisation widely used in your code base? **[1 point]**
+> We used a library to build and verify JWT tokens, but we built the function which is supposed to verify permissions from the JWT.
 
-- [ ] Do you have any way to ensure authorisation is checked on every endpoint? **[1 point]**
+- [x] Do you have any way to ensure authorisation is checked on every endpoint? **[1 point]**
 > It is pretty easy to forget authorising some action.
 > For obvious reasons, it may lead to security issues and bugs.
 > At work, we use `varvet/pundit` in our `Ruby on Rails` stack. It can raise exception just before answering the client if authorisation is not checked.
 > https://github.com/varvet/pundit#ensuring-policies-and-scopes-are-used
 > 
-> How did you achieve this?
+> We added permissions tests for each of our routes
 
 ### Secret and configuration management
 
-- [ ] Use a hash for any sensitive data you do not need to store as plain text. 🔵
-> Also check this if you do not store any password or such data (and say it here).
+- [x] Use a hash for any sensitive data you do not need to store as plain text. 🔵
+> Yes we're doing it using the crypto node library, and hashing passwords using sha-256
 
-- [ ] Store your configuration entries in environment variables or outside the git scope. **[1 point]** 🔵
-> How did you achieve this?
+- [x] Store your configuration entries in environment variables or outside the git scope. **[1 point]** 🔵
+> We did it using dotenv library and different environments such as dev, prod, or test
 
-- [ ] Do you provide a way to list every configuration entries (setup instructions, documentation, requireness... are appreciated)? **[1 point]**
-> How did you achieve this?
+- [x] Do you provide a way to list every configuration entries (setup instructions, documentation, requireness... are appreciated)? **[1 point]**
+> Yes, firstly in the `Getting Started` section of the README.MD, as well as in our `endpoints.ts` file
 
-- [ ] Do you have a kind of configuration validation with meaningful error messages? **[1 point]**
-> How did you achieve this?
+- [x] Do you have a kind of configuration validation with meaningful error messages? **[1 point]**
+> Yes we verify that the configuration file are well loaded, if not, we throw an error
 
 ### Package management
 
-- [ ] Do not use any package with less than 50k downloads a week. 🔵
+- [x] Do not use any package with less than 50k downloads a week. 🔵
+> Nope
 
 - [ ] Did you write some automated tools that check no unpopular dependency was installed? If yes, ensure it runs frequently. **[1 point]**
 > How did you achieve this? A Github Action (or similar) and compliance rule for pull requests are appreciated.
 
-- [ ] Properly use dependencies and devDevepencies in your package.json. **[0.5 points]**
-> How did you achieve this?
+- [x] Properly use dependencies and devDevepencies in your package.json. **[0.5 points]**
+> Yes
 
 ### Automated API generation
 
-- [ ] Do you have automated documentation generation for your API (such as OpenAPI/Swagger...)? **[1 point]** 🔵
-> How did you achieve this?
+- [x] Do you have automated documentation generation for your API (such as OpenAPI/Swagger...)? **[1 point]** 🔵
+> We used fastify-swagger to automatically generate a swagger page from our app
 > You must link your documentation for review (a Github page, a ZIP archive, an attachment to the release notes...).
+> You can access it by opening the following file `./swagger/Swagger UI.html`
 
-- [ ] In addition to requireness and types, do you provide a comment for every property of your documentation? **[1 point]**
-> How did you achieve this?
+- [x] In addition to requireness and types, do you provide a comment for every property of your documentation? **[1 point]**
+> With fastify-swagger custom properties
 
-- [ ] Do you document the schema of responses (at least for success codes) and provide examples of payloads? **[1 point]**
-> How did you achieve this?
+- [x] Do you document the schema of responses (at least for success codes) and provide examples of payloads? **[1 point]**
+> With fastify-swagger custom properties
 
 - [ ] Is your documentation automatically built and published when a commit reach the develop or master branches? **[1 point]**
 > How did you achieve this?
 
 ### Error management
 
-- [ ] Do not expose internal application state or code (no sent stacktrace in production!). **[1 point]** 🔵
-> How did you achieve this?
+- [x] Do not expose internal application state or code (no sent stacktrace in production!). **[1 point]** 🔵
+> We only send back to the user custom error messages, and keep original logs internally
 
 - [ ] Do you report errors to Sentry, Rollbar, Stackdriver… **[1 point]**
 > How did you achieve this?
 
 ### Log management
 
-- [ ] Mention everything you put in place for a better debugging experience based on the logs collection and analysis. **[3 points]**
-> How did you achieve this?
+- [x] Mention everything you put in place for a better debugging experience based on the logs collection and analysis. **[3 points]**
+> The only place where logs are triggered are routes, so we're sure to not have double error messages. 
+> As well as we're having an env config variable to set the log as on or off. 
 
-- [ ] Mention everything you put in place to ensure no sensitive data were recorded to the log. **[1 point]**
-> How did you achieve this?
+- [x] Mention everything you put in place to ensure no sensitive data were recorded to the log. **[1 point]**
+> As explained before, logs are always internal, and depend on the env config
 
 ### Asynchronous first
 
-- [ ] Always use the async implementations when available. **[1 point]** 🔵
+- [x] Always use the async implementations when available. **[1 point]** 🔵
 > List all the functions you call in their async implementation instead of the sync one.
 > 
 > Ex: I used `await fs.readFile` in file `folder/xxx.ts:120` instead of `fs.readFileSync`.
 
-- [ ] No unhandled promise rejections, no uncaught exceptions… **[1 point]** 🔵
-> For example, how do you ensure every promise rejection is caught and properly handled?
-> Tips: one part of the answer could be the use of a linter.
+- [x] No unhandled promise rejections, no uncaught exceptions… **[1 point]** 🔵
+> We used a try catch over all our routes, and we're using eslint to verify our code
 
 ### Code quality
 
-- [ ] Did you put a focus on reducing code duplication? **[1 point]**
-> How did you achieve this?
+- [x] Did you put a focus on reducing code duplication? **[1 point]**
+> We did that by creating a `bin` folder, containing all the reusable code, with for example, a log of `utils` functions.
+> We even created a `error-messages.ts` to avoid re-writing all the error messages
 
 - [ ] Eslint rules are checked for any pushed commit to develop or master branch. **[1 point]**
-> Please provide a link to the sample of Github Action logs (or similar).
+> Please provide a link to the sample of  logs (or similar).
 
 ### Automated tests
 
-- [ ] You implemented automated specs. **[1 point]** 🔵
+- [x] You implemented automated specs. **[1 point]** 🔵
 > Please provide a link to the more complete summary you have.
 
-- [ ] Your test code coverage is 75% or more.  **[1 point]** 🔵
-> Please provide a link to the `istanbul` HTML coverage summary (or from a similar tool).
+- [x] Your test code coverage is 75% or more.  **[1 point]** 🔵
+> Report can be visualized here: ``/sewing-notebook/coverage/lcov-report/index.html``
 
 - [ ] Do you run the test on a CD/CI, such as Github Action? **[1 point]**
 > Please provide a link to the latest test summary you have, hosted on Github Action or similar.

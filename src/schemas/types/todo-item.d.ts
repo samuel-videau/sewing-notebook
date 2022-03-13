@@ -1,9 +1,10 @@
+import {SupplyRequired} from "./supplyRequired";
+
 export interface TodoItem {
-  name: string
-  description?: string
-  completed: boolean
-  supplyRequired: {
-    supplyRef: unknown
-    quantity: number
-  }[]
+  id?: string,
+  projectId?: string,
+  name: string,
+  description: string,
+  completed: boolean,
+  suppliesRequired?: SupplyRequired[]
 }
