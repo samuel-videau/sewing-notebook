@@ -93,8 +93,8 @@ In your explanation, please provide links (file + line) to relevant parts of you
 
 ### Secret and configuration management
 
-- [ ] Use a hash for any sensitive data you do not need to store as plain text. 🔵
-> Not yet, maybe we'll do it late //TODO
+- [x] Use a hash for any sensitive data you do not need to store as plain text. 🔵
+> Yes we're doing it using the crypto node library, and hashing passwords using sha-256
 
 - [x] Store your configuration entries in environment variables or outside the git scope. **[1 point]** 🔵
 > We did it using dotenv library and different environments such as dev, prod, or test
