@@ -14,9 +14,9 @@ DB.connect(function(err) {
 	logMessage('Connected!');
 });
 
-export async function executeQuery(query: string): Promise<any> {
+export async function executeQuery(query: string, values?: any[]): Promise<any> {
 	return new Promise((resolve, reject) => {
-		DB.query(query, (err, res) => {
+		DB.query(query, values, (err, res) => {
 			if (err) reject(err);
 			else resolve(res);
 		});

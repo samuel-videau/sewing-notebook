@@ -67,7 +67,7 @@ In your explanation, please provide links (file + line) to relevant parts of you
 - [x] Ensure the type of every input can be inferred by Typescript at any time and properly propagates across the app. **[1 point]** 🔵
 > We used fastify automatic body conversion to our typescript interfaces
 
-- [ ] Ensure the static and runtime input types are always synced. **[1 point]** 🔵
+- [x] Ensure the static and runtime input types are always synced. **[1 point]** 🔵
 > How did you achieve this? If extra commands must be run before the typescript checking, how do you ensure there are run?
 
 ### Authorisation

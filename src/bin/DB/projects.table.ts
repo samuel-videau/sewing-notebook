@@ -9,13 +9,13 @@ export async function queryAllProjects(): Promise<Project[]> {
 
 export async function insertProject(name: string, description: string): Promise<string> {
     const id: string = generateId();
-    await executeQuery('INSERT INTO projects VALUES (' + id + ', \'' + name + '\', \'' + description + '\');');
+    await executeQuery('INSERT INTO projects VALUES (' + id + ', ?, ?);', [name, description]);
     return id;
 }
 
 export async function editProject(id: string, name: string, description: string): Promise<void> {
   /* eslint-disable */
-  const res = await executeQuery('UPDATE projects SET name = \'' + name + '\', description = \'' + description + '\' WHERE id = ' + id + ';');
+  const res = await executeQuery('UPDATE projects SET name = ?, description = ? WHERE id = ?;', [name, description, id]);
   if (res.changedRows === 0) throw(ERROR_PROJECT_NOT_FOUND);
   /* eslint-enable */
 }
