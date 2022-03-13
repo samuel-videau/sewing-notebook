@@ -121,6 +121,7 @@ In your explanation, please provide links (file + line) to relevant parts of you
 - [x] Do you have automated documentation generation for your API (such as OpenAPI/Swagger...)? **[1 point]** 🔵
 > We used fastify-swagger to automatically generate a swagger page from our app
 > You must link your documentation for review (a Github page, a ZIP archive, an attachment to the release notes...).
+> You can access it by opening the following file `./swagger/Swagger UI.html`
 
 - [x] In addition to requireness and types, do you provide a comment for every property of your documentation? **[1 point]**
 > With fastify-swagger custom properties

@@ -85,7 +85,7 @@ export async function todoItemsController (fastify: FastifyInstance) {
         method: 'GET',
         url: '/',
         schema: {
-            description: 'Get the list of all to-do items',
+            description: 'Get the list of all to-do items of a specific project',
             tags: ['to-do'],
             summary: 'Get all to-do items',
           params : projectParamsSchema,
@@ -119,6 +119,9 @@ export async function todoItemsController (fastify: FastifyInstance) {
         method: 'GET',
         url: '/:todoItemId',
         schema: {
+            description: 'Get a specific to-do item',
+            tags: ['to-do'],
+            summary: 'Get a to-do item',
             response: { 200: todoItemSchema },
             params: projectTodoParamsSchema
           },
@@ -141,6 +144,9 @@ export async function todoItemsController (fastify: FastifyInstance) {
         method: 'PUT',
         url: '/:todoItemId',
         schema: {
+            description: 'Edit the information of a to-do item',
+            tags: ['to-do'],
+            summary: 'Edit a to-do item',
             body: todoItemSchema,
             params: projectTodoParamsSchema
           },
@@ -163,6 +169,9 @@ export async function todoItemsController (fastify: FastifyInstance) {
         method: 'DELETE',
         url: '/:todoItemId',
         schema: {
+          description: 'Delete a to-do item',
+          tags: ['to-do'],
+          summary: 'Delete a to-do item',
             params: projectTodoParamsSchema
         },
         handler: async function (request, reply) {
@@ -185,6 +194,9 @@ export async function todoItemsController (fastify: FastifyInstance) {
     method: 'PUT',
     url: '/:todoItemId/complete',
     schema: {
+      description: 'Set the status of a to-do item as complete, this will update the supplies quantities',
+      tags: ['to-do'],
+      summary: 'Complete a to-do item',
       params: projectTodoParamsSchema
     },
     handler: async function (request, reply) {

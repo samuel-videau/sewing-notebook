@@ -15,8 +15,8 @@ export async function usersController (fastify: FastifyInstance) {
     method: 'POST',
     url: '/',
     schema: {
-      description: 'Create a user',
-      tags: ['user'],
+      description: 'Create a user using email and password',
+      tags: ['auth'],
       summary: 'Create a user',
       body: userSchema,
     },

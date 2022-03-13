@@ -32,7 +32,8 @@ export const fastify = fastifyFactory({ logger: false })
       tags: [
         { name: 'supply', description: 'End-points related to supplies management' },
         { name: 'project', description: 'End-points related to projects management' },
-        { name: 'to-do', description: 'End-points related to to-do list management' }
+        { name: 'to-do', description: 'End-points related to to-do list management' },
+        { name: 'auth', description: 'End-points related to authentication management' }
       ],
       securityDefinitions: {
         apiKey: {

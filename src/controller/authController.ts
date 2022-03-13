@@ -15,7 +15,7 @@ export async function authController (fastify: FastifyInstance) {
     url: '/',
     schema: {
       description: 'Get a JWT token with email and password login',
-      tags: ['user'],
+      tags: ['auth'],
       summary: 'Login to an account',
       body: userSchema,
     },
