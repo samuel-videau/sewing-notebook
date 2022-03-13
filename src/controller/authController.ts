@@ -6,6 +6,7 @@ import {User} from "../schemas/types/user";
 import {queryUser} from "../bin/DB/users.table";
 import {generateJWT} from "../bin/json-web-token";
 import {JWT_VALIDITY_TIME} from "../environment/config";
+import {hashString} from "../bin/utils/hash";
 
 export async function authController (fastify: FastifyInstance) {
 
@@ -21,7 +22,7 @@ export async function authController (fastify: FastifyInstance) {
     handler: async (request, reply) => {
       try {
         const user: User = request.body;
-        const userId = await queryUser(user.email, user.password);
+        const userId = await queryUser(user.email, hashString(user.password));
         const jwt: string = generateJWT(userId);
 
         return reply.code(200).send({
